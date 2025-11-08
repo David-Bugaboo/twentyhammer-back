@@ -1,0 +1,563 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-11-06T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2025.0.0",
+  "resources": [
+    {
+      "_id": "wrk_project_queries",
+      "created": 0,
+      "description": "",
+      "modified": 0,
+      "name": "Project Queries",
+      "parentId": null,
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_project_queries",
+      "modified": 0,
+      "created": 0,
+      "name": "Base Environment",
+      "data": {
+        "baseUrl": "http://localhost:3000",
+        "modifierSlug": "example-modifier",
+        "spellSlug": "fireball",
+        "spellLoreSlug": "pyromancy",
+        "skillSlug": "swordmaster",
+        "skillListSlug": "combat",
+        "advancementSlug": "veteran",
+        "injurySlug": "broken-arm",
+        "equipmentSlug": "longsword",
+        "superNaturalAbilitySlug": "fearless",
+        "factionSlug": "empire",
+        "baseFigureSlug": "empire-swordsman"
+      },
+      "dataPropertyOrder": null,
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 0,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_queries",
+      "parentId": "wrk_project_queries",
+      "modified": 0,
+      "created": 0,
+      "name": "Queries",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1000000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_spells",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Spells",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -900000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_spells_list",
+      "parentId": "fld_spells",
+      "created": 0,
+      "modified": 0,
+      "name": "List Spells",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/spells",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "difficultyClass", "value": "" },
+        { "name": "spellLoreSlug", "value": "" },
+        { "name": "description", "value": "" },
+        { "name": "keywords", "value": "" }
+      ],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "authentication": {},
+      "metaSortKey": -900000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_spells_get",
+      "parentId": "fld_spells",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Spell by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/spells/{{ _.spellSlug }}",
+      "parameters": [],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "authentication": {},
+      "metaSortKey": -899999999,
+      "_type": "request"
+    },
+    {
+      "_id": "req_spell_lores_list",
+      "parentId": "fld_spells",
+      "created": 0,
+      "modified": 0,
+      "name": "List Spell Lores",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/spell-lores",
+      "parameters": [{ "name": "name", "value": "" }],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -899999998,
+      "_type": "request"
+    },
+    {
+      "_id": "req_spell_lore_get",
+      "parentId": "fld_spells",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Spell Lore by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/spell-lores/{{ _.spellLoreSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -899999997,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_skills",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Skills & Lists",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -800000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_skills_list",
+      "parentId": "fld_skills",
+      "created": 0,
+      "modified": 0,
+      "name": "List Skills",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/skills",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "skillListSlug", "value": "" },
+        { "name": "description", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -800000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_skills_get",
+      "parentId": "fld_skills",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Skill by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/skills/{{ _.skillSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -799999999,
+      "_type": "request"
+    },
+    {
+      "_id": "req_skill_lists_list",
+      "parentId": "fld_skills",
+      "created": 0,
+      "modified": 0,
+      "name": "List Skill Lists",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/skill-lists",
+      "parameters": [{ "name": "name", "value": "" }],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -799999998,
+      "_type": "request"
+    },
+    {
+      "_id": "req_skill_list_get",
+      "parentId": "fld_skills",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Skill List by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/skill-lists/{{ _.skillListSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -799999997,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_advancements",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Advancements",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -700000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_advancements_list",
+      "parentId": "fld_advancements",
+      "created": 0,
+      "modified": 0,
+      "name": "List Advancements",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/advancements",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "description", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -700000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_advancement_get",
+      "parentId": "fld_advancements",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Advancement by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/advancements/{{ _.advancementSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -699999999,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_injuries",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Injuries",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -600000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_injuries_list",
+      "parentId": "fld_injuries",
+      "created": 0,
+      "modified": 0,
+      "name": "List Injuries",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/injuries",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "description", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -600000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_injury_get",
+      "parentId": "fld_injuries",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Injury by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/injuries/{{ _.injurySlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -599999999,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_equipments",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Equipments",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -500000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_equipments_list",
+      "parentId": "fld_equipments",
+      "created": 0,
+      "modified": 0,
+      "name": "List Equipments",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/equipments",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "category", "value": "" },
+        { "name": "rarity", "value": "" },
+        { "name": "avaiability", "value": "" },
+        { "name": "exclusions", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -500000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_equipment_get",
+      "parentId": "fld_equipments",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Equipment by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/equipments/{{ _.equipmentSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -499999999,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_supernatural",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "SuperNatural Abilities",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -400000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_supernatural_list",
+      "parentId": "fld_supernatural",
+      "created": 0,
+      "modified": 0,
+      "name": "List SuperNatural Abilities",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/supernatural-abilities",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "category", "value": "" },
+        { "name": "description", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -400000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_supernatural_get",
+      "parentId": "fld_supernatural",
+      "created": 0,
+      "modified": 0,
+      "name": "Get SuperNatural Ability by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/supernatural-abilities/{{ _.superNaturalAbilitySlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -399999999,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_factions",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Factions",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -300000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_factions_list",
+      "parentId": "fld_factions",
+      "created": 0,
+      "modified": 0,
+      "name": "List Factions",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/factions",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "slug", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -300000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_faction_get",
+      "parentId": "fld_factions",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Faction by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/factions/{{ _.factionSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -299999999,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_modifiers",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Modifiers",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -250000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_modifiers_list",
+      "parentId": "fld_modifiers",
+      "created": 0,
+      "modified": 0,
+      "name": "List Modifiers",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/modifiers",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "category", "value": "" },
+        { "name": "effect", "value": "" },
+        { "name": "multiplier", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -250000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_modifier_get",
+      "parentId": "fld_modifiers",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Modifier by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/modifiers/{{ _.modifierSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -249999999,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_basefigures",
+      "parentId": "fld_queries",
+      "created": 0,
+      "modified": 0,
+      "name": "Base Figures",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -200000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_basefigures_list",
+      "parentId": "fld_basefigures",
+      "created": 0,
+      "modified": 0,
+      "name": "List Base Figures",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/base-figures",
+      "parameters": [
+        { "name": "name", "value": "" },
+        { "name": "role", "value": "" },
+        { "name": "factionSlug", "value": "" },
+        { "name": "race", "value": "" },
+        { "name": "quality", "value": "" }
+      ],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -200000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_basefigure_get",
+      "parentId": "fld_basefigures",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Base Figure by Slug",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/queries/base-figures/{{ _.baseFigureSlug }}",
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.accessToken }}" }
+      ],
+      "authentication": {},
+      "metaSortKey": -199999999,
+      "_type": "request"
+    }
+  ]
+}

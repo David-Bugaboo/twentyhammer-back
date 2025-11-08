@@ -1,0 +1,133 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-11-06T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2025.0.0",
+  "resources": [
+    {
+      "_id": "wrk_warbands",
+      "created": 0,
+      "description": "",
+      "modified": 0,
+      "name": "Warbands Only",
+      "parentId": null,
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_warbands_base",
+      "parentId": "wrk_warbands",
+      "modified": 0,
+      "created": 0,
+      "name": "Base Environment",
+      "data": {
+        "baseUrl": "http://localhost:3000",
+        "warbandId": "00000000-0000-0000-0000-000000000000"
+      },
+      "dataPropertyOrder": null,
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 0,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_warbands",
+      "parentId": "wrk_warbands",
+      "modified": 0,
+      "created": 0,
+      "name": "Warbands",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1000000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_warbands_list",
+      "parentId": "fld_warbands",
+      "created": 0,
+      "modified": 0,
+      "name": "List Warbands",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/warbands",
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "perPage", "value": "10" }
+      ],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "authentication": {},
+      "metaSortKey": -900000000,
+      "_type": "request"
+    },
+    {
+      "_id": "req_warbands_create",
+      "parentId": "fld_warbands",
+      "created": 0,
+      "modified": 0,
+      "name": "Create Warband",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/warbands",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Reiklanders\",\n  \"factionSlug\": \"empire\",\n  \"userId\": \"00000000-0000-0000-0000-000000000000\",\n  \"crowns\": 500,\n  \"wyrdstone\": 0\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -899999999,
+      "_type": "request"
+    },
+    {
+      "_id": "req_warbands_get",
+      "parentId": "fld_warbands",
+      "created": 0,
+      "modified": 0,
+      "name": "Get Warband by ID",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/warbands/{{ _.warbandId }}",
+      "parameters": [],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "authentication": {},
+      "metaSortKey": -899999998,
+      "_type": "request"
+    },
+    {
+      "_id": "req_warbands_update",
+      "parentId": "fld_warbands",
+      "created": 0,
+      "modified": 0,
+      "name": "Update Warband",
+      "method": "PATCH",
+      "url": "{{ _.baseUrl }}/warbands/{{ _.warbandId }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Reiklanders (Updated)\",\n  \"crowns\": 450,\n  \"wyrdstone\": 2\n}"
+      },
+      "parameters": [],
+      "headers": [
+        { "name": "Accept", "value": "application/json" },
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "authentication": {},
+      "metaSortKey": -899999997,
+      "_type": "request"
+    },
+    {
+      "_id": "req_warbands_delete",
+      "parentId": "fld_warbands",
+      "created": 0,
+      "modified": 0,
+      "name": "Delete Warband",
+      "method": "DELETE",
+      "url": "{{ _.baseUrl }}/warbands/{{ _.warbandId }}",
+      "parameters": [],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "authentication": {},
+      "metaSortKey": -899999996,
+      "_type": "request"
+    }
+  ]
+}
