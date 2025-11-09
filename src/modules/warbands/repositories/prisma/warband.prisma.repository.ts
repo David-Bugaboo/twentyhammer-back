@@ -34,7 +34,109 @@ export class WarbandPrismaRepository implements WarbandsRepository {
           include: {
             baseFigure: true,
           },
-          
+        },
+      },
+    },
+  };
+  private readonly fullWarbandInclude = {
+    faction: true,
+    user: true,
+    vault: {
+      include: {
+        equipment: true,
+        modifier: true,
+      },
+    },
+    warbandSoldiers: {
+      include: {
+        advancements: {
+          include: {
+            advancement: true,
+          },
+        },
+        baseFigure: {
+          include: {
+            baseFigure: {
+              include: {
+                
+                raceLimits: true,
+                avaiableEquipment: {
+                  include: {
+                    avaiableEquipment: true,
+                  },
+                },
+                skillLists: {
+                  include: {
+                    skillList: true,
+                  },
+                },
+                spellLores: {
+                  include: {
+                    spellLore: true,
+                  },
+                },
+                legendStartingEquipment: {
+                  include: {
+                    equipment: true,
+                  },
+                },
+                legendStartingSkills: {
+                  include: {
+                    skill: true,
+                  },
+                },
+                legendStartingSpells: {
+                  include: {
+                    spell: true,
+                  },
+                },
+                mercenaryStartingEquipment: {
+                  include: {
+                    equipment: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        equipment: {
+          include: {
+            equipment: true,
+            modifier: true,
+          },
+        },
+        injuries: {
+          include: {
+            injury: true,
+          },
+        },
+        skills: {
+          include: {
+            skill: {
+              include: {
+                skillList: true,
+              },
+            },
+          },
+        },
+        spells: {
+          include: {
+            spell: {
+              include: {
+                spellLore: true,
+              },
+            },
+          },
+        },
+        supernaturalAbilities: {
+          include: {
+            superNaturalAbility: true,
+          },
+        },
+        promotedHeroSkillLists: {
+          include: {
+            skillList: true,
+          },
         },
       },
     },
@@ -72,7 +174,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
       where: {
         id,
       },
-      include: this.defaultWarbandInclude,
+      include: this.fullWarbandInclude,
     });
     return plainToInstance(Warband, warband);
   }
