@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -38,8 +39,12 @@ export class WarbandsService {
     return this.repo.findAllWarbands(query);
   }
 
-  findOne(id: string) {
-    return this.repo.findWarbandById(id);
+  async findOne(id: string, userId: string) {
+    const warband = await this.repo.findWarbandById(id);
+    if (warband.userId !== userId) {
+      throw new ForbiddenException('Você não tem permissão para acessar este bando!');
+    }
+    return warband;
   }
 
   update(id: string, updateWarbandDto: UpdateWarbandDto) {

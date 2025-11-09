@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 
 
 
+
 @Module({
   imports: [
     QueriesModule,
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -49,9 +49,10 @@ export class WarbandsController {
   findAll(@Query() query: QueryDto) {
     return this.warbandsService.findAll(query);
   }
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.warbandsService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: Request) {
+    return this.warbandsService.findOne(id, req.user!.id);
   }
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateWarbandDto: UpdateWarbandDto) {
