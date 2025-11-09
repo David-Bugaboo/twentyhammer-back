@@ -222,7 +222,51 @@ export class QueriesPrismaRepository implements QueriesRepository {
     });
   }
   async findFactionByslug(slug: string): Promise<Faction> {
-    return this.prisma.faction.findUniqueOrThrow({ where: { slug } });
+    return this.prisma.faction.findUniqueOrThrow({
+      where: { slug },
+      include: {
+        figures: {
+          include: {
+            avaiableEquipment: {
+              include: {
+                avaiableEquipment: true,
+              },
+            },
+            raceLimits: true,
+            skillLists: {
+              include: {
+                skillList: true,
+              },
+            },
+            spellLores: {
+              include: {
+                spellLore: true,
+              },
+            },
+            legendStartingEquipment: {
+              include: {
+                equipment: true,
+              },
+            },
+            legendStartingSkills: {
+              include: {
+                skill: true,
+              },
+            },
+            legendStartingSpells: {
+              include: {
+                spell: true,
+              },
+            },
+            mercenaryStartingEquipment: {
+              include: {
+                equipment: true,
+              },
+            },
+          }
+        }
+      }
+    });
   }
   // base figures
   async findAllBaseFigures(dto: BaseFigureQueryDto): Promise<BaseFigure[]> {
