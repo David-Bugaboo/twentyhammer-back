@@ -192,11 +192,29 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
         where: { id: soldierId },
         select: {
           warbandId: true,
+          baseFigure: {
+            select: {
+              baseFigure: {
+                select: {
+                  cost: true,
+                },
+              }
+            }
+          },
           equipment: {
             select: {
               equipmentSlug: true,
               modifierSlug: true,
             },
+          },
+        },
+      });
+
+      await this.prisma.warband.update({
+        where: { id: soldier.warbandId },
+        data: {
+          crowns: {
+            decrement: soldier.baseFigure[0].baseFigure.cost,
           },
         },
       });
@@ -210,6 +228,8 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
           },
         });
       }
+
+
 
       await tx.warbandSoldier.delete({
         where: {
