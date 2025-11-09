@@ -1,0 +1,1 @@
+{"version":3,"file":"skill.entity.js","sourceRoot":"","sources":["../../../src/entities/skill.entity.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,yDAAyC;AACzC,2DAAgD;AAEhD,MAAa,KAAK;IAChB,EAAE,CAAU;IACZ,IAAI,CAAU;IACd,IAAI,CAAU;IACd,aAAa,CAAU;IACvB,WAAW,CAAU;IACrB,SAAS,CAAQ;IAEjB,SAAS,CAAa;CACvB;AATD,sBASC;AADC;IADC,IAAA,wBAAI,EAAC,GAAG,EAAE,CAAC,6BAAS,CAAC;8BACV,6BAAS;wCAAC"}

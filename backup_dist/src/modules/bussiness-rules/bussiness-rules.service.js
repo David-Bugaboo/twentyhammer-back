@@ -1,0 +1,334 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BussinessRulesService = void 0;
+const common_1 = require("@nestjs/common");
+const queries_service_1 = require("../queries/queries.service");
+let BussinessRulesService = class BussinessRulesService {
+    queriesService;
+    constructor(queriesService) {
+        this.queriesService = queriesService;
+    }
+    normalizeSpecialRules(specialRules) {
+        if (!specialRules || !Array.isArray(specialRules)) {
+            return [];
+        }
+        const normalized = [];
+        for (const rule of specialRules) {
+            if (typeof rule !== 'object' || rule === null) {
+                continue;
+            }
+            const candidate = rule;
+            if (candidate.label === undefined || candidate.value === undefined) {
+                continue;
+            }
+            normalized.push({
+                label: String(candidate.label),
+                value: String(candidate.value),
+            });
+        }
+        return normalized;
+    }
+    async getLeader(factionSlug) {
+        const leader = await this.queriesService.findAllBaseFigures({
+            role: 'LIDER',
+            factionSlug,
+        });
+        const hasLeader = leader.length > 0;
+        const leaderFound = leader[0] !== undefined;
+        if (!hasLeader) {
+            throw new common_1.NotFoundException('facção sem líder!');
+        }
+        if (!leaderFound) {
+            throw new common_1.NotFoundException('Líder não encontrado!');
+        }
+        return leader[0];
+    }
+    async validateFaction(factionSlug) {
+        try {
+            const faction = await this.queriesService.findFactionByslug(factionSlug);
+            const factionExists = !!faction;
+            if (!factionExists) {
+                throw new common_1.NotFoundException('Facção não encontrada!');
+            }
+            return factionExists;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('Facção não encontrada!');
+        }
+    }
+    async resolveFigure(slug) {
+        const figure = await this.queriesService.findBaseFigureByslug(slug);
+        const figureExists = !!figure;
+        if (!figureExists) {
+            throw new common_1.NotFoundException('Figura não encontrada!');
+        }
+        return figure;
+    }
+    async resolveEquipment(slug) {
+        try {
+            const equipment = await this.queriesService.findEquipmentByslug(slug);
+            const equipmentExists = !!equipment;
+            if (!equipmentExists) {
+                throw new common_1.NotFoundException('Equipamento não encontrado!');
+            }
+            return equipment;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('Equipamento não encontrado!');
+        }
+    }
+    async resolveModifier(slug) {
+        try {
+            const modifier = await this.queriesService.findModifierByslug(slug);
+            const modifierExists = !!modifier;
+            if (!modifierExists) {
+                throw new common_1.NotFoundException('Modificador não encontrado!');
+            }
+            return modifier;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('Modificador não encontrado!');
+        }
+    }
+    async ValidateModifier(modifier, equipment) {
+        const modifierCategory = modifier.category
+            .split(`Modificador de `)[1]
+            .trim();
+        const isCategoryCompatible = modifierCategory === equipment.category;
+        if (!isCategoryCompatible) {
+            throw new common_1.BadRequestException('Modificador inválido!');
+        }
+    }
+    async validateIfBuyIsValid(warband, equipment, loot, modifier) {
+        if (loot)
+            return;
+        const isInAllowed = equipment.avaiability.includes(warband.faction.name) ||
+            equipment.avaiability.includes('Todos');
+        const isInExcluded = equipment.exclusions.includes(warband.faction.name);
+        const modifierMultiplier = modifier?.multiplier ?? 1;
+        const equipmentCost = equipment.cost * modifierMultiplier;
+        const shouldRejectEquipment = !isInAllowed || isInExcluded;
+        const hasEnoughCrowns = warband.crowns >= equipmentCost;
+        if (shouldRejectEquipment) {
+            throw new common_1.BadRequestException('Equipamento não permitido para esta facção!');
+        }
+        if (!hasEnoughCrowns) {
+            throw new common_1.BadRequestException('Coroas insuficientes!');
+        }
+    }
+    async resolveEquipmentToWarbandSoldier(id) {
+        try {
+            const equipmentToWarbandSoldier = await this.queriesService.findEquipmentToWarbandSoldierById(id);
+            const equipmentFound = !!equipmentToWarbandSoldier;
+            if (!equipmentFound) {
+                throw new common_1.NotFoundException('Equipamento não encontrado no inventário.');
+            }
+            return equipmentToWarbandSoldier;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('Equipamento não encontrado no inventário.');
+        }
+    }
+    async checkForCompatibility(equipmentSlug, soldierCompatibility, soldierSkills, equipmentCategory, specialRules) {
+        const hasCompatibility = soldierCompatibility.length > 0;
+        const isCombatGearCategory = equipmentCategory === `Armadura` ||
+            equipmentCategory === `Arma Corpo a Corpo` ||
+            equipmentCategory === `Arma a Distância` ||
+            equipmentCategory === `Arma de Fogo` ||
+            equipmentCategory === `Escudo` ||
+            equipmentCategory === `Elmo`;
+        const isMeleeWeapon = equipmentCategory === `Arma Corpo a Corpo`;
+        const isRangedWeapon = equipmentCategory === `Arma a Distância`;
+        const isFirearm = equipmentCategory === `Arma de Fogo`;
+        const hasArsenalMastery = soldierCompatibility.includes(`mestre-do-arsenal`);
+        const hasSharpshooter = soldierCompatibility.includes(`mestre-atirador`);
+        const hasSpecificCompatibility = soldierCompatibility.includes(equipmentSlug);
+        const hasCasterRule = specialRules.some((rule) => rule.label === `Conjurador`);
+        const isArmor = equipmentCategory === `Armadura`;
+        const isShield = equipmentCategory === `Escudo`;
+        const isHelmet = equipmentCategory === `Elmo`;
+        const canUseMeleeWeapon = !isMeleeWeapon || hasArsenalMastery || hasSpecificCompatibility;
+        const canUseRangedWeapon = !isRangedWeapon || hasSharpshooter || hasSpecificCompatibility;
+        const canUseFirearm = !isFirearm || hasSharpshooter || hasSpecificCompatibility;
+        const casterCanUseArmor = !hasCasterRule || isArmor;
+        const casterCanUseShield = !hasCasterRule || isShield;
+        const casterCanUseHelmet = !hasCasterRule || isHelmet;
+        const isCompatible = hasCompatibility &&
+            (!isCombatGearCategory ||
+                (canUseMeleeWeapon &&
+                    canUseRangedWeapon &&
+                    canUseFirearm &&
+                    casterCanUseArmor &&
+                    casterCanUseShield &&
+                    casterCanUseHelmet));
+        if (!hasCompatibility)
+            return false;
+        if (!isCombatGearCategory)
+            return true;
+        if (!isCompatible)
+            return false;
+        return true;
+    }
+    async validateSkill(skillSlug, warbandSoldierSkills, warbandSoldierSkillLists) {
+        const hasSkillLists = warbandSoldierSkillLists.length > 0;
+        if (!hasSkillLists) {
+            throw new common_1.BadRequestException('Figura não pode aprender habilidades!');
+        }
+        let skill;
+        try {
+            skill = await this.queriesService.findSkillByslug(skillSlug);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('habilidade não encontrada!');
+        }
+        const isForceSkill = skill.skillListSlug === `forca`;
+        const hasCorpoTreinado = warbandSoldierSkills.includes(`corpo-treinado`);
+        const canSkipForceRestriction = isForceSkill && hasCorpoTreinado;
+        const isAlreadyLearned = warbandSoldierSkills.includes(skillSlug);
+        const isSkillAllowed = warbandSoldierSkillLists.includes(skill.skillListSlug);
+        if (canSkipForceRestriction)
+            return;
+        if (isAlreadyLearned) {
+            throw new common_1.BadRequestException('Habilidade já aprendida!');
+        }
+        if (!isSkillAllowed) {
+            throw new common_1.BadRequestException('Habilidade não permitida para esta figura!');
+        }
+    }
+    async validateSpell(spellSlug, warbandSoldierSpellLores, warbandSoldierSpells, warbandSoldierSkills) {
+        const hasSpellLore = warbandSoldierSpellLores.length > 0;
+        const hasArcaneLearning = warbandSoldierSkills.includes(`aprendizado-arcano`);
+        const isCaster = hasSpellLore || hasArcaneLearning;
+        const spellAlreadyKnown = warbandSoldierSpells.includes(spellSlug);
+        if (!isCaster) {
+            throw new common_1.BadRequestException('Figura não é um conjurador!');
+        }
+        if (spellAlreadyKnown) {
+            throw new common_1.BadRequestException('Magia já aprendida!');
+        }
+        let spell;
+        try {
+            spell = await this.queriesService.findSpellByslug(spellSlug);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('magia não encontrada!');
+        }
+        const isInferiorMagic = spell.spellLoreSlug === `magia-inferior`;
+        const canLearnInferiorMagic = isInferiorMagic && hasArcaneLearning;
+        const isSpellAllowed = warbandSoldierSpellLores.includes(spell.spellLoreSlug);
+        if (canLearnInferiorMagic)
+            return;
+        if (!isSpellAllowed) {
+            throw new common_1.BadRequestException('Magia não permitida para esta tradição!');
+        }
+    }
+    async validateAddedAdvancement(advancementSlug, warbandSoldierAdvancements) {
+    }
+    async validateSuperNaturalAbility(supernaturalAbilitySlug, warbandSoldierSuperNaturalAbilities, warbandSoldierBaseFigure, warbandSoldierSkills, warbandCrowns) {
+        const isRepeatedAbility = warbandSoldierSuperNaturalAbilities.includes(supernaturalAbilitySlug);
+        const isIgnoredRepetition = supernaturalAbilitySlug === `tentaculo` ||
+            supernaturalAbilitySlug === `obesidade-morbida`;
+        const supernaturalAbilityRepeated = isRepeatedAbility && !isIgnoredRepetition;
+        const canPickMutation = warbandSoldierBaseFigure.canGetMutations &&
+            !warbandSoldierSkills.includes(`linhagem-corrompida`);
+        const canPickBlessing = warbandSoldierBaseFigure.canGetBlessings;
+        const canPickSacredMark = warbandSoldierBaseFigure.canGetSacredMarks;
+        const superNaturalAbility = await this.queriesService.findSuperNaturalAbilityByslug(supernaturalAbilitySlug);
+        const hasCrowns = warbandCrowns >= superNaturalAbility.cost;
+        const isMutation = superNaturalAbility.category === `Mutação`;
+        const isBlessing = superNaturalAbility.category === `Benção de Nurgle`;
+        const isSacredMark = superNaturalAbility.category === `Marca Sagrada`;
+        if (supernaturalAbilityRepeated) {
+            throw new common_1.BadRequestException('Habilidade Supernatural já adicionada!');
+        }
+        if (!canPickMutation && isMutation) {
+            throw new common_1.BadRequestException('Figura não pode adquirir mutações!');
+        }
+        if (!canPickBlessing && isBlessing) {
+            throw new common_1.BadRequestException('Figura não pode adquirir bênçãos de nurgle!');
+        }
+        if (!canPickSacredMark && isSacredMark) {
+            throw new common_1.BadRequestException('Figura não pode adquirir marcas sagradas!');
+        }
+        if (!hasCrowns) {
+            throw new common_1.BadRequestException('Coroas insuficientes!');
+        }
+    }
+    async validateInjury(injurySlug, warbandSoldierInjuries, warbandSoldierRole) {
+        const injurableRoles = [`HEROI`, `LIDER`, `LENDA`];
+        const isRepeatedInjury = warbandSoldierInjuries.includes(injurySlug);
+        const isRoleAllowed = injurableRoles.includes(warbandSoldierRole);
+        if (isRepeatedInjury) {
+            throw new common_1.BadRequestException('Ferimento já adicionado!');
+        }
+        if (!isRoleAllowed) {
+            throw new common_1.BadRequestException('Tipo de figura não recebe ferimentos!');
+        }
+    }
+    async validateAdvancement(advancementSlug, warbandSoldierAdvancements, warbandSoldierRole) {
+        const soldierInvalidAdvancements = [`fortalecer-magia`, `nova-habilidade`, `nova-magia`];
+        const soldierRepeatedAdvancement = warbandSoldierRole === `SOLDADO` && warbandSoldierAdvancements.includes(advancementSlug);
+        const soldierInvalidAdvancement = warbandSoldierRole === `SOLDADO` && soldierInvalidAdvancements.includes(advancementSlug);
+        const isLegend = warbandSoldierRole === `LENDA`;
+        const invalidHeroAdvancement = (warbandSoldierRole === `HEROI` || warbandSoldierRole === `MERCENARIO`) && advancementSlug === `o-moleque-tem-talento`;
+        if (soldierInvalidAdvancement) {
+            throw new common_1.BadRequestException('Avanço não permitido para esta figura!');
+        }
+        if (invalidHeroAdvancement) {
+            throw new common_1.BadRequestException('Avanço não permitido para esta figura!');
+        }
+        if (soldierRepeatedAdvancement) {
+            throw new common_1.BadRequestException('Avanço já adicionado!');
+        }
+        if (soldierInvalidAdvancement) {
+            throw new common_1.BadRequestException('Avanço não permitido para esta figura!');
+        }
+        if (isLegend) {
+            throw new common_1.BadRequestException('Avanço não permitido para esta figura!');
+        }
+    }
+    async validateEquip(warbandSoldierEquipment, warbandSoldierEquipmentList, warbandSoldierSuperNaturalAbilities, warbandSoldierInjuries, hand) {
+        const validOffHandCategories = [`Escudo`, `Arma Corpo a Corpo`, `Arma a Distância`, `Arma de Fogo`];
+        const validMainHandCategories = [`Arma Corpo a Corpo`, `Arma a Distância`, `Arma de Fogo`];
+        const validTwoHandCategories = [`Arma Corpo a Corpo`, `Arma a Distância`, `Arma de Fogo`];
+        const isValidOffhandCategory = validOffHandCategories.includes(warbandSoldierEquipment.equipment?.category);
+        const isValidMainHandCategory = validMainHandCategories.includes(warbandSoldierEquipment.equipment?.category);
+        const isValidTwoHandCategory = validTwoHandCategories.includes(warbandSoldierEquipment.equipment?.category);
+        const equipamentSpecialRules = this.normalizeSpecialRules(warbandSoldierEquipment.equipment?.specialRules);
+        const hasColossalClaw = warbandSoldierSuperNaturalAbilities.includes(`garra-colossal`);
+        const hasCrushedForearm = warbandSoldierInjuries.includes(`antebraco-esmagado`);
+        const usingUnbalancedInMainHand = warbandSoldierEquipmentList.some(warbandSoldierEquipment => warbandSoldierEquipment.mainHandEquiped === true &&
+            this.normalizeSpecialRules(warbandSoldierEquipment.equipment?.specialRules).some(rule => rule.label === `Desbalanceada`));
+        const weaponIsTwoHanded = equipamentSpecialRules.some(rule => rule.label === `Duas Mãos`);
+        const weaponIsVersatile = equipamentSpecialRules.some(rule => rule.label === `Versátil`);
+        const hasOffhandRestriction = hasColossalClaw || hasCrushedForearm || usingUnbalancedInMainHand;
+        if (hand === 'offHandEquiped' && (!isValidOffhandCategory || hasOffhandRestriction))
+            throw new common_1.BadRequestException('Equipamento não permitido para esta mão!');
+        if (hand === 'mainHandEquiped' && (!isValidMainHandCategory || weaponIsTwoHanded))
+            throw new common_1.BadRequestException('Equipamento não permitido para esta mão!');
+        if (hand === 'twoHandedEquiped' &&
+            (!isValidTwoHandCategory || (!weaponIsTwoHanded && !weaponIsVersatile)))
+            throw new common_1.BadRequestException('Equipamento não permitido para esta mão!');
+        if (hand == `armorEquiped` && warbandSoldierEquipment.equipment?.category !== `Armadura`) {
+            throw new common_1.BadRequestException('Item não é armadura!');
+        }
+        if (hand == `helmetEquiped` && warbandSoldierEquipment.equipment?.category !== `Elmo`) {
+            throw new common_1.BadRequestException('Item não é elmo!');
+        }
+    }
+};
+exports.BussinessRulesService = BussinessRulesService;
+exports.BussinessRulesService = BussinessRulesService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [queries_service_1.QueriesService])
+], BussinessRulesService);
+//# sourceMappingURL=bussiness-rules.service.js.map
