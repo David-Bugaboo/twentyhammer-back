@@ -1,4 +1,5 @@
-import { JsonValue } from "generated/prisma/internal/prismaNamespace";
+
+import { JsonValue } from '@prisma/client/runtime/library';
 
 export class Equipment {
   id!: string;
