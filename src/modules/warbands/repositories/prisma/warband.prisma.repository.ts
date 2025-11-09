@@ -278,6 +278,47 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     });
     return plainToInstance(Warband, updated);
   }
+  async fireSoldierFromWarband(
+    warbandId: string,
+    warbandToSoldierId: string,
+  ): Promise<Warband> {
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const soldier = await tx.warbandSoldier.findFirstOrThrow({
+        where: {
+          id: warbandToSoldierId,
+          warbandId,
+        },
+        include: {
+          equipment: true,
+        },
+      });
+
+      if (soldier.equipment.length > 0) {
+        await tx.equipmentToVault.createMany({
+          data: soldier.equipment.map((equipment) => ({
+            warbandId,
+            equipmentSlug: equipment.equipmentSlug,
+            modifierSlug: equipment.modifierSlug ?? undefined,
+          })),
+        });
+      }
+
+      await tx.warbandSoldier.delete({
+        where: {
+          id: warbandToSoldierId,
+        },
+      });
+
+      return tx.warband.findUniqueOrThrow({
+        where: {
+          id: warbandId,
+        },
+        include: this.defaultWarbandInclude,
+      });
+    });
+
+    return plainToInstance(Warband, updated);
+  }
   async addEquipmentToWarbandVault(
     warbandId: string,
     equipment: Equipment,

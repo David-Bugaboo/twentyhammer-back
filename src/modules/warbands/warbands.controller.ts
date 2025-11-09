@@ -96,4 +96,16 @@ export class WarbandsController {
       boolSell,
     );
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':warbandId/fire/:warbandToSoldierId')
+  fireSoldierFromWarband(
+    @Param('warbandId') warbandId: string,
+    @Param('warbandToSoldierId') warbandToSoldierId: string,
+  ) {
+    return this.warbandsService.fireSoldierFromWarband(
+      warbandId,
+      warbandToSoldierId,
+    );
+  }
 }

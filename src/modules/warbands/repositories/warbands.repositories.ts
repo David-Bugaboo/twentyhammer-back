@@ -30,6 +30,10 @@ export abstract class WarbandsRepository {
     warbandId: string,
     warbandToSoldierId: string,
   ): Promise<Warband>;
+  abstract fireSoldierFromWarband(
+    warbandId: string,
+    warbandToSoldierId: string,
+  ): Promise<Warband>;
   abstract addEquipmentToWarbandVault(
     warbandId: string,
     equipment: Equipment,

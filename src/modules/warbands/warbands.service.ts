@@ -104,6 +104,11 @@ export class WarbandsService {
     );
   }
 
+  async fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string) {
+    await this.resolveWarband(warbandId);
+    return this.repo.fireSoldierFromWarband(warbandId, warbandToSoldierId);
+  }
+
   //helper methods
 
   async resolveWarband(id: string): Promise<Warband> {
