@@ -209,12 +209,12 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
           },
         },
       });
-
+1
       await this.prisma.warband.update({
         where: { id: soldier.warbandId },
         data: {
           crowns: {
-            decrement: soldier.baseFigure[0].baseFigure.cost,
+            increment: soldier.baseFigure[0].baseFigure.cost,
           },
         },
       });
