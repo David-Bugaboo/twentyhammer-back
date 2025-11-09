@@ -1,0 +1,34 @@
+import { BaseFigureToWarbandSoldier } from './base-figure-to-warband-soldier.entity';
+import { EquipmentToWarbandSoldier } from './equipment-to-warband-soldier.entity';
+import { ExtraSkillListToWarbandSoldier } from './extra-skill-list-to-warband-soldier.entity';
+import { ExtraSpellLoreToWarbandSoldier } from './extra-spell-lore-to-warband-soldier.entity';
+import { GiftOfTzeentchToWarbandSoldier } from './gift-of-tzeentch-to-warband-soldier.entity';
+import { InjuryToWarbandSoldier } from './injury-to-warband-soldier.entity';
+import { SkillToWarbandSoldier } from './skill-to-warband-soldier.entity';
+import { SpellToWarbandSoldier } from './spell-to-warband-soldier.entity';
+import { AdvancementToWarbandSoldier } from './advancement-to-warband-soldier.entity';
+import { SuperNaturalAbilityToWarbandSoldier } from './super-natural-ability-to-warband-soldier.entity';
+import { PromotedHeroSkillLists } from './promoted-hero-skill-list.entity';
+import type { Role } from 'src/entities/base-figure.entity';
+import { Warband } from 'src/modules/warbands/entities/warband.entity';
+export declare class WarbandSoldier {
+    id: string;
+    campaignName?: string | null;
+    warbandId: string;
+    experience: number;
+    effectiveRole?: Role | null;
+    createdAt: Date;
+    extraSpecialRules?: unknown;
+    advancements?: AdvancementToWarbandSoldier[];
+    baseFigure?: BaseFigureToWarbandSoldier[];
+    equipment?: EquipmentToWarbandSoldier[];
+    extraSkillLists?: ExtraSkillListToWarbandSoldier[];
+    extraSpellLists?: ExtraSpellLoreToWarbandSoldier[];
+    giftsOfTzeentch?: GiftOfTzeentchToWarbandSoldier[];
+    injuries?: InjuryToWarbandSoldier[];
+    skills?: SkillToWarbandSoldier[];
+    spells?: SpellToWarbandSoldier[];
+    supernaturalAbilities?: SuperNaturalAbilityToWarbandSoldier[];
+    promotedHeroSkillLists?: PromotedHeroSkillLists[];
+    warband?: Warband;
+}
