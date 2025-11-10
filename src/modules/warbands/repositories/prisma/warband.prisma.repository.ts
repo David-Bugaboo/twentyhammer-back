@@ -148,13 +148,14 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     factionSlug: string,
     leader: BaseFigure,
   ): Promise<Warband> {
+    const isDaggerCompatible = leader.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`)
     const warband = await this.prisma.warband.create({
       data: {
         ...data,
         userId,
         factionSlug,
         warbandSoldiers: {
-          create: {
+          create: isDaggerCompatible ? {
             effectiveRole: leader.role as Role,
             experience: leader.startingXp ?? 0,
             baseFigure: {
@@ -162,6 +163,21 @@ export class WarbandPrismaRepository implements WarbandsRepository {
                 baseFigureSlug: leader.slug,
               },
             },
+            equipment: {
+              create: {
+                compatible: true,
+                equipmentSlug: `adaga`
+              }
+            }
+            
+          }:{
+            effectiveRole: leader.role as Role,
+            experience: leader.startingXp ?? 0,
+            baseFigure: {
+              create: {
+                baseFigureSlug: leader.slug,
+              },
+            },  
           },
         },
       },
@@ -225,6 +241,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     warbandId: string,
     soldier: BaseFigure,
   ): Promise<Warband> {
+    const isDaggerCompatible = soldier.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`)
     const updated = await this.prisma.$transaction(async (tx) => {
       const warband = await tx.warband.findUniqueOrThrow({
         where: {
@@ -239,7 +256,26 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         where: {
           id: warbandId,
         },
-        data: {
+        data: isDaggerCompatible ? {
+          warbandSoldiers: {
+            create: {
+              effectiveRole: soldier.role as Role,
+              experience: soldier.startingXp ?? 0,
+              baseFigure: {
+                create: {
+                  baseFigureSlug: soldier.slug,
+                },
+              },
+              equipment: {
+                create: {
+                  compatible: true,
+                  equipmentSlug: `adaga`
+                },
+              },
+            },
+          },
+          crowns: warband.crowns - soldier.cost,
+        }:{
           warbandSoldiers: {
             create: {
               effectiveRole: soldier.role as Role,
@@ -346,7 +382,6 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     });
     return plainToInstance(Warband, updated);
   }
-
   async undoEquipmentFromWarbandVault(
     warbandId: string,
     equipmentToVaultId: string,

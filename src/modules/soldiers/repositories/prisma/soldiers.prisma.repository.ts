@@ -209,7 +209,7 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
           },
         },
       });
-1
+
       await this.prisma.warband.update({
         where: { id: soldier.warbandId },
         data: {
@@ -281,5 +281,4 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       },
     });
   }
-
 }

@@ -396,4 +396,16 @@ export class BussinessRulesService {
       throw new BadRequestException('Item não é elmo!');
     }
   }
+  async validateInventorySpace(warbandSoldierEquipmentList: EquipmentToWarbandSoldier[], equipmentCategory: string): Promise<void> { 
+    const hasAtLeastOneDagger = warbandSoldierEquipmentList.filter(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipmentSlug === `adaga`).length >= 1;
+    var howManyCloseCombatWeapons = warbandSoldierEquipmentList.filter(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipment?.category === `Arma Corpo a Corpo`).length + warbandSoldierEquipmentList.filter(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipment?.category === `Escudo`).length;
+    const howManyRangedWeapons = warbandSoldierEquipmentList.filter(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipment?.category === `Arma a Distância` || equipmentToWarbandSoldier.equipment?.category === `Arma de Fogo`).length;
+    const howManyArmors = warbandSoldierEquipmentList.filter(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipment?.category === `Armadura`).length;
+    if (hasAtLeastOneDagger && howManyCloseCombatWeapons >= 1) {
+      howManyCloseCombatWeapons -= 1;
+    }
+    if (equipmentCategory === `Arma Corpo a Corpo`  && howManyCloseCombatWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas arma corpo a corpo!');
+    if ((equipmentCategory === `Arma a Distância` || equipmentCategory === `Arma de Fogo`) && howManyRangedWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas armas a distância!');
+    if (equipmentCategory === `Armadura` && howManyArmors >= 1) throw new BadRequestException('Figura não pode carregar mais de uma armadura!');
+  }
 }
