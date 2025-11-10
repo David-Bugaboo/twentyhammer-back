@@ -120,33 +120,34 @@ export class SoldiersService {
     await this.bussinessRulesService.validateEquip(warbandSoldierEquipment, soldierEquipment ?? [], soldierSuperNaturalAbilities, soldierInjuries ?? [], slot)
 
     if (slot === `armorEquiped` && soldierArmor) { 
+      await this.bussinessRulesService.validateArmor(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
       await this.repo.unequipGear(soldierArmor.id);
     }
-    
     if (slot === `helmetEquiped` && soldierHelmet) { 
+      await this.bussinessRulesService.validateHelmet(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
       await this.repo.unequipGear(soldierHelmet.id);
     }
     if (slot === `twoHandedEquiped`) { 
+      await this.bussinessRulesService.validateEquipTwoHanded(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? []);
       await this.repo.unequipAllHandsFromSoldier(soldier.id);
     }
-    if (slot === `offHandEquiped` && soldierOffHand) { 
-      await this.repo.unequipGear(soldierOffHand.id);
+    if (slot === `offHandEquiped`) { 
+      await this.bussinessRulesService.validateOffhand(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
 
-      if (soldierMainHand && isMainHandWeaponDebalanced) {
-        await this.repo.unequipGear(soldierMainHand.id);
-      }
-    }
-    if (slot === `mainHandEquiped` && soldierMainHand) {
-      await this.repo.unequipGear(soldierMainHand.id);
-      if (soldierOffHand && isMainHandWeaponDebalanced) {
+      if (soldierOffHand) {
         await this.repo.unequipGear(soldierOffHand.id);
+      }
+
+      
+    }
+    if (slot === `mainHandEquiped`) {
+      await this.bussinessRulesService.validateMainHand(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
+
+      if (soldierMainHand) {
+        await this.repo.unequipGear(soldierMainHand.id);
       }
     }
 
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
-
-
-
-    
   }
 }
