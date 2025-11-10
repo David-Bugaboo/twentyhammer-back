@@ -1,11 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateSoldierDto } from './dto/create-soldier.dto';
-import { UpdateSoldierDto } from './dto/update-soldier.dto';
 import { SoldiersRepository } from './repositories/soldiers.repository';
 import { WarbandsService } from '../warbands/warbands.service';
 import { QueriesService } from '../queries/queries.service';
 import { BussinessRulesService } from '../bussiness-rules/bussiness-rules.service';
-import { SuperNaturalAbility } from 'src/entities/super-natural-ability.entity';
 
 @Injectable()
 export class SoldiersService {
@@ -31,15 +28,6 @@ export class SoldiersService {
       await this.queriesService.findEquipmentToWarbandSoldierById(
         warbandToSoldierItem,
       );
-
-    await this.warbandRepo.addEquipmentToVault(
-      equipment.warbandSoldier?.warbandId!,
-      {
-        equipmentSlug: equipment.equipmentSlug,
-        modifierSlug: equipment.modifierSlug ?? undefined,
-      },
-      true,
-    );
 
     await this.repo.removeEquipmentFromSoldier(warbandToSoldierItem);
   }
