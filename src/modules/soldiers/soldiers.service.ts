@@ -44,9 +44,15 @@ export class SoldiersService {
     await this.repo.removeEquipmentFromSoldier(warbandToSoldierItem);
   }
   async addEquipmentToSoldier(soldierId: string, warbandVaultItem: string) {
-    const equipment =
+    const equipmentToVault =
       await this.queriesService.findEquipmentToVaultById(warbandVaultItem);
-    return this.repo.addEquipmentToSoldier(soldierId, equipment);
+    
+    const soldier = await this.repo.findSoldierById(soldierId);
+
+    const soldierCompatibility = soldier.baseFigure?.[0]?.baseFigure?.avaiableEquipment?.map(avaiableEquipment => avaiableEquipment.avaiableEquipmentSlug) ?? [];
+    const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
+    await this.bussinessRulesService.checkForCompatibility(equipmentToVault.equipmentSlug, soldierCompatibility, soldierSkills, equipmentToVault.equipment!.category);
+    return this.repo.addEquipmentToSoldier(soldierId, equipmentToVault);
   }
   async removeEquipmetFromSoldier(warbandToSoldierItemId: string) {
       return this.repo.removeEquipmentFromSoldier(warbandToSoldierItemId);

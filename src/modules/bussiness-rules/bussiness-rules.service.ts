@@ -177,56 +177,24 @@ export class BussinessRulesService {
     soldierCompatibility: string[],
     soldierSkills: string[],
     equipmentCategory: string,
-    specialRules: { label: string; value: string }[],
   ) {
-    const hasCompatibility = soldierCompatibility.length > 0;
-    const isCombatGearCategory =
-      equipmentCategory === `Armadura` ||
-      equipmentCategory === `Arma Corpo a Corpo` ||
-      equipmentCategory === `Arma a Distância` ||
-      equipmentCategory === `Arma de Fogo` ||
-      equipmentCategory === `Escudo` ||
-      equipmentCategory === `Elmo`;
-    const isMeleeWeapon = equipmentCategory === `Arma Corpo a Corpo`;
-    const isRangedWeapon = equipmentCategory === `Arma a Distância`;
-    const isFirearm = equipmentCategory === `Arma de Fogo`;
-    const hasArsenalMastery = soldierCompatibility.includes(`mestre-do-arsenal`);
-    const hasSharpshooter = soldierCompatibility.includes(`mestre-atirador`);
-    const hasSpecificCompatibility = soldierCompatibility.includes(
-      equipmentSlug,
-    );
-    const hasCasterRule = specialRules.some(
-      (rule) => rule.label === `Conjurador`,
-    );
-    const isArmor = equipmentCategory === `Armadura`;
-    const isShield = equipmentCategory === `Escudo`;
-    const isHelmet = equipmentCategory === `Elmo`;
-    const canUseMeleeWeapon =
-      !isMeleeWeapon || hasArsenalMastery || hasSpecificCompatibility;
-    const canUseRangedWeapon =
-      !isRangedWeapon || hasSharpshooter || hasSpecificCompatibility;
-    const canUseFirearm =
-      !isFirearm || hasSharpshooter || hasSpecificCompatibility;
-    const casterCanUseArmor = !hasCasterRule || isArmor;
-    const casterCanUseShield = !hasCasterRule || isShield;
-    const casterCanUseHelmet = !hasCasterRule || isHelmet;
-    const isCompatible =
-      hasCompatibility &&
-      (!isCombatGearCategory ||
-        (canUseMeleeWeapon &&
-          canUseRangedWeapon &&
-          canUseFirearm &&
-          casterCanUseArmor &&
-          casterCanUseShield &&
-          casterCanUseHelmet));
+    const isEquipableCategory = [`Arma Corpo a Corpo`, `Arma a Distância`, `Arma de Fogo`, `Escudo`, `Elmo`, `Armadura`];
+    const hasArmoryMaster = soldierSkills.includes(`mestre-do-arsenal`)
+    const hasMarksmenMaster = soldierSkills.includes(`mestre-atirador`)
 
-    if (!hasCompatibility) return false;
+    if (!isEquipableCategory.includes(equipmentCategory)) 
+      return true;
 
-    if (!isCombatGearCategory) return true;
+    if (hasArmoryMaster && equipmentCategory === `Arma Corpo a Corpo`) return ;
+    
+    if (hasMarksmenMaster && (equipmentCategory === `Arma a Distância` || equipmentCategory === `Arma de Fogo`)) return ;
+    
+    if (soldierCompatibility.includes(equipmentSlug)) return ;
+    
+    
 
-    if (!isCompatible) return false;
 
-    return true;
+    throw new BadRequestException('Equipamento não permitido para esta figura!');
   }
   async validateSkill(
     skillSlug: string,
