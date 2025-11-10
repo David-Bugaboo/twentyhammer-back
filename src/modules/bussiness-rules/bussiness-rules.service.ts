@@ -44,7 +44,6 @@ export class BussinessRulesService {
 
     return normalized;
   }
-
   async getLeader(factionSlug: string): Promise<BaseFigure> {
     const leader = await this.queriesService.findAllBaseFigures({
       role: 'LIDER',
@@ -408,14 +407,18 @@ export class BussinessRulesService {
     if ((equipmentCategory === `Arma a Distância` || equipmentCategory === `Arma de Fogo`) && howManyRangedWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas armas a distância!');
     if (equipmentCategory === `Armadura` && howManyArmors >= 1) throw new BadRequestException('Figura não pode carregar mais de uma armadura!');
   }
-  async validateEquipTwoHanded(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[]): Promise<void> { 
+  async validateEquipTwoHanded(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void> { 
     const equipamentSpecialRules = this.normalizeSpecialRules(equipment.specialRules);
     const hasColossalClaw = warbandSoldierMutations.includes(`garra-colossal`);
     const hasCrushedForearm = warbandSoldierInjuries.includes(`antebraco-esmagado`);
     const weaponIsTwoHanded = equipamentSpecialRules.some(rule => rule.label === `Duas Mãos` || rule.label === `Versátil`);
-
+    const hasMainHandOrOffHandEquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true || equipmentToWarbandSoldier.offHandEquiped === true);
     if (hasColossalClaw || hasCrushedForearm) {
       throw new BadRequestException('Figura não pode equipar arma  duas mãos!');
+    }
+
+    if(hasMainHandOrOffHandEquiped) {
+      throw new BadRequestException('Mãos já ocupadas!');
     }
 
     if(!weaponIsTwoHanded) {
@@ -430,15 +433,15 @@ export class BussinessRulesService {
     const mainHandWeaponIsDesbalanced = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true && this.normalizeSpecialRules(equipmentToWarbandSoldier.equipment?.specialRules).some(rule => rule.label === `Desbalanceada`));
 
     if (hasColossalClaw || hasCrushedForearm) {
-      throw new BadRequestException('Figura não pode equipar arma  duas mãos!');
+      throw new BadRequestException('Figura não pode equipar sua mão secundária!');
     }
 
     if(!weaponIsOffhandValid) {
       throw new BadRequestException('Equipamento não é uma arma válida de mão secundária!');
     }
 
-    if(mainHandWeaponIsDesbalanced) {
-      throw new BadRequestException('Figura não pode equipar arma de mão secundária se a primária for desbalanceada!');
+    if(mainHandWeaponIsDesbalanced && equipment.category !== `Escudo`) {
+      throw new BadRequestException('Figura não pode equipar arma na mão secundária se a primária for desbalanceada!');
     }
 
   }
@@ -447,31 +450,43 @@ export class BussinessRulesService {
     const equipamentSpecialRules = this.normalizeSpecialRules(equipment.specialRules);
     const weaponIsDesbalanced = equipamentSpecialRules.some(rule => rule.label === `Desbalanceada`);
     const weaponIsTwoHandedOnly = equipamentSpecialRules.some(rule => rule.label === `Duas Mãos`);
-    const hasOffHandEqquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.offHandEquiped === true);
+    const hasOffHandEqquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.offHandEquiped === true && equipmentToWarbandSoldier.equipment?.category !== `Escudo`);
     const isvalidMainHand = validMainHandCategories.includes(equipment.category);
+    const hasTwoHandedWeaponEquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.twoHandedEquiped === true);
 
+    if(hasTwoHandedWeaponEquiped) {
+      throw new BadRequestException('Mãos já ocupadas!');
+    }
     if(!isvalidMainHand) {
       throw new BadRequestException('Equipamento não é uma arma válida de mão primária!');
     }
 
     if(weaponIsDesbalanced && hasOffHandEqquiped) {
-      throw new BadRequestException('Figura não pode equipar arma de mão primária desbalanceada se tiver arma de mão secundária!');
+      throw new BadRequestException('Figura não pode equipar arma de mão primária desbalanceada se tiver arma de mão secundária leve ou pistola!');
     }
 
     if (weaponIsTwoHandedOnly) 
       throw new BadRequestException('Figura não pode equipar arma de duas mãos na mão primária!');
   }
   async validateArmor(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void> {
-
+    const hasArmorEquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipment?.category === `Armadura`);
     const isvalidArmor = equipment.category === `Armadura`;
     if (!isvalidArmor) {
       throw new BadRequestException('Equipamento não é uma armadura válida!');
     }
+
+    if(hasArmorEquiped) {
+      throw new BadRequestException('Figura não pode equipar mais de uma armadura!');
+    }
   }
   async validateHelmet(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void> {
+    const hasHelmetEquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.equipment?.category === `Elmo`);
     const isvalidHelmet = equipment.category === `Elmo`;
     if (!isvalidHelmet) {
       throw new BadRequestException('Equipamento não é um elmo válido!');
+    }
+    if(hasHelmetEquiped) {
+      throw new BadRequestException('Figura não pode equipar mais de um elmo!');
     }
   }
 }
