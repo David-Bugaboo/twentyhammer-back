@@ -273,6 +273,20 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       },
     });
   }
+  async unequipSlotFromSoldier(
+    soldierId: string,
+    slot: string,
+  ): Promise<void> {
+    await this.prisma.equipmentToWarbandSoldier.updateMany({
+      where: {
+        warbandSoldierId: soldierId,
+        [slot]: true,
+      },
+      data: {
+        [slot]: false,
+      } as Record<string, boolean>,
+    });
+  }
   async equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void> { 
     await this.prisma.equipmentToWarbandSoldier.update({
       where: { id: equipmentToWarbandSoldierId },

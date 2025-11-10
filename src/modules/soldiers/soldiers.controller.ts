@@ -39,6 +39,22 @@ export class SoldiersController {
       slot,
     );
   }
+  @Delete('equipment/:equipmentToWarbandSoldierId/unequip')
+  async unequipItemFromSoldier(
+    @Param('equipmentToWarbandSoldierId')
+    equipmentToWarbandSoldierId: string,
+  ) {
+    await this.soldiersService.unequipItemFromSoldier(
+      equipmentToWarbandSoldierId,
+    );
+  }
+  @Delete(':soldierId/equipment-slot/:slot')
+  async unequipSlotFromSoldier(
+    @Param('soldierId') soldierId: string,
+    @Param('slot') slot: string,
+  ) {
+    await this.soldiersService.unequipSlotFromSoldier(soldierId, slot);
+  }
   @Post(':soldierId/spells/:spellSlug')
   async addSpellToSoldier(
     @Param('soldierId') soldierId: string,

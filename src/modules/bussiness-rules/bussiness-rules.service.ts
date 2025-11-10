@@ -426,7 +426,7 @@ export class BussinessRulesService {
     const equipamentSpecialRules = this.normalizeSpecialRules(equipment.specialRules);
     const hasColossalClaw = warbandSoldierMutations.includes(`garra-colossal`);
     const hasCrushedForearm = warbandSoldierInjuries.includes(`antebraco-esmagado`);
-    const weaponIsOffhandValid = equipamentSpecialRules.some(rule => rule.label === `Leve`) || equipment.category === `Escudo`;
+    const weaponIsOffhandValid = equipamentSpecialRules.some(rule => rule.label === `Leve` || rule.label === `Pistola`) || equipment.category === `Escudo`;
     const mainHandWeaponIsDesbalanced = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true && this.normalizeSpecialRules(equipmentToWarbandSoldier.equipment?.specialRules).some(rule => rule.label === `Desbalanceada`));
 
     if (hasColossalClaw || hasCrushedForearm) {

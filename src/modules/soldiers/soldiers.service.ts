@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { SoldiersRepository } from './repositories/soldiers.repository';
 import { WarbandsService } from '../warbands/warbands.service';
 import { QueriesService } from '../queries/queries.service';
@@ -149,5 +149,24 @@ export class SoldiersService {
     }
 
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
+  }
+  async unequipItemFromSoldier(equipmentToWarbandSoldierId: string) {
+    await this.repo.unequipGear(equipmentToWarbandSoldierId);
+  }
+  async unequipSlotFromSoldier(soldierId: string, slot: string) {
+    const allowedSlots = [
+      'mainHandEquiped',
+      'offHandEquiped',
+      'twoHandedEquiped',
+      'armorEquiped',
+      'helmetEquiped',
+    ];
+
+    if (!allowedSlots.includes(slot)) {
+      throw new BadRequestException('Slot inválido para desequipar.');
+    }
+
+    await this.repo.findSoldierById(soldierId);
+    await this.repo.unequipSlotFromSoldier(soldierId, slot);
   }
 }
