@@ -192,6 +192,7 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
         where: { id: soldierId },
         select: {
           warbandId: true,
+          effectiveRole: true,
           baseFigure: {
             select: {
               baseFigure: {
@@ -219,14 +220,16 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
         },
       });
 
-      for (const equipment of soldier.equipment) {
-        await tx.equipmentToVault.create({
-          data: {
-            warbandId: soldier.warbandId,
-            equipmentSlug: equipment.equipmentSlug,
-            modifierSlug: equipment.modifierSlug,
-          },
-        });
+      if (soldier.effectiveRole !== `MERCENARIO` && soldier.effectiveRole !== `LENDA`) {
+        for (const equipment of soldier.equipment) {
+          await tx.equipmentToVault.create({
+            data: {
+              warbandId: soldier.warbandId,
+              equipmentSlug: equipment.equipmentSlug,
+              modifierSlug: equipment.modifierSlug,
+            },
+          });
+        }
       }
 
 

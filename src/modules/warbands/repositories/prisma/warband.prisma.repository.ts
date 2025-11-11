@@ -252,6 +252,10 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     soldier: BaseFigure,
   ): Promise<Warband> {
     const isDaggerCompatible = soldier.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`)
+    const startingEquipment = isDaggerCompatible ? [{
+      compatible: true,
+      equipmentSlug: `adaga`
+    }] : []
     const updated = await this.prisma.$transaction(async (tx) => {
       const warband = await tx.warband.findUniqueOrThrow({
         where: {
@@ -266,7 +270,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         where: {
           id: warbandId,
         },
-        data: isDaggerCompatible ? {
+        data:  {
           warbandSoldiers: {
             create: {
               effectiveRole: soldier.role as Role,
@@ -277,27 +281,39 @@ export class WarbandPrismaRepository implements WarbandsRepository {
                 },
               },
               equipment: {
-                create: {
+                createMany: {
+                  data: [
+                  ...startingEquipment,
+                 
+                 ...soldier.mercenaryStartingEquipment?.map(equipment => ({
+                    compatible: true,
+                    equipmentSlug: equipment.equipmentSlug,
+                 })) ?? [],
+                 ...soldier.legendStartingEquipment?.map(equipment => ({
                   compatible: true,
-                  equipmentSlug: `adaga`
+                  equipmentSlug: equipment.equipmentSlug,
+                 })) ?? [],
+                ]},
+              },
+              spells: {
+                createMany: {
+                  data: soldier.legendStartingSpells?.map(spell => ({
+                    spellSlug: spell.spellSlug,
+                  })) ?? [],
+                },
+              },
+              skills: {
+                createMany: {
+                  data: soldier.legendStartingSkills?.map(skill => ({
+                    skillSlug: skill.skillSlug,
+                  })) ?? [],
                 },
               },
             },
           },
-          crowns: warband.crowns - soldier.cost,
-        }:{
-          warbandSoldiers: {
-            create: {
-              effectiveRole: soldier.role as Role,
-              experience: soldier.startingXp ?? 0,
-              baseFigure: {
-                create: {
-                  baseFigureSlug: soldier.slug,
-                },
-              },
-            },
-          },
-          crowns: warband.crowns - soldier.cost,
+          crowns: {
+            decrement: soldier.cost,
+          }
         },
         include: this.defaultWarbandInclude,
       });
@@ -328,6 +344,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     warbandId: string,
     warbandToSoldierId: string,
   ): Promise<Warband> {
+    
     const updated = await this.prisma.$transaction(async (tx) => {
       const soldier = await tx.warbandSoldier.findFirstOrThrow({
         where: {
@@ -339,7 +356,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         },
       });
 
-      if (soldier.equipment.length > 0) {
+      if (soldier.equipment.length > 0 && soldier.effectiveRole !== `MERCENARIO` && soldier.effectiveRole !== `LENDA` ) {
         await tx.equipmentToVault.createMany({
           data: soldier.equipment.map((equipment) => ({
             warbandId,
