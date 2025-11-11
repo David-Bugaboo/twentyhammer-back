@@ -142,7 +142,7 @@ export class WarbandsService {
       );
 
     }
-     if (isMercOrLegend && isInInclusions && !isInExclusions) {
+     if (isMercOrLegend && (!isInInclusions || isInExclusions)) {
         throw new BadRequestException(
           `${soldier.name} Não pode ser contratado por ${warband.faction?.name ?? ``}!`,
         );
