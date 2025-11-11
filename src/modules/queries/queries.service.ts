@@ -112,4 +112,8 @@ export class QueriesService {
       throw new NotFoundException('Equipamento não encontrado no inventário.');
     }
   }
+
+  findSkillToWarbandSoldierById(id: string) {
+    return this.repo.findSkillToWarbandSoldierById(id);
+  }
 }
