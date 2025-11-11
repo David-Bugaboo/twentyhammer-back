@@ -451,4 +451,66 @@ export class WarbandPrismaRepository implements WarbandsRepository {
 
     return plainToInstance(Warband, updated);
   }
+  async findWarbandAvaiableHirings(factionName:string): Promise<BaseFigure[]> {
+    const figures = await this.prisma.baseFigure.findMany({
+      where: {
+        role: {
+          in: [`MERCENARIO`, `LENDA`],
+        },
+        OR: [
+          {
+            avaiability: {
+              has: factionName,
+            },
+          },
+          {
+            avaiability: {
+              has: `Todos`, 
+            },
+          },
+        ],
+        NOT: {
+          exclusions: {
+            has: factionName,
+          },
+        },
+      },
+      include: {
+        avaiableEquipment: {
+          include: {
+            avaiableEquipment: true,
+          },
+        },
+        skillLists: {
+          include: {
+            skillList: true,
+          },
+        },
+        spellLores: {
+          include: {
+            spellLore: true,
+          },
+        },
+        legendStartingEquipment: true,
+        legendStartingSkills: {
+          include: {
+            skill: true,
+          },
+        },
+        legendStartingSpells: {
+          include: {
+            spell: true,
+          },
+        },
+        mercenaryStartingEquipment: {
+          include: {
+            equipment: true,
+          },
+        },
+      },
+    });
+
+    return plainToInstance(BaseFigure, figures);
+  }
+  
 }

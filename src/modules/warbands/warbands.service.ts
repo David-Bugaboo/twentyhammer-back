@@ -44,24 +44,25 @@ export class WarbandsService {
     if (warband.userId !== userId) {
       throw new ForbiddenException('Você não tem permissão para acessar este bando!');
     }
-    return warband;
+    const avaiableHirings = await this.findWarbandAvaiableHirings(warband.faction?.name ?? ``);
+    return {
+      ...warband,
+      mercenaries: avaiableHirings.filter(figure => figure.role === `MERCENARIO`),
+      legends: avaiableHirings.filter(figure => figure.role === `LENDA`),
+    };
   }
-
   update(id: string, updateWarbandDto: UpdateWarbandDto) {
     return this.repo.updateWarband(id, updateWarbandDto);
   }
-
   remove(id: string) {
     return this.repo.deleteWarband(id);
   }
-
   async addSoldierToWarband(warbandId: string, soldierSlug: string) {
     const soldier = await this.bussinessRulesService.resolveFigure(soldierSlug);
     const warband = await this.resolveWarband(warbandId);
     await this.validateFigureAddition(warband, soldier);
     return this.repo.addSoldierToWarband(warbandId, soldier);
   }
-
   async addEquipmentToVault(
     warbandId: string,
     dto: AddEquipmentToVaultDto,
@@ -93,8 +94,6 @@ export class WarbandsService {
       modifier,
     );
   }
-
-
   async undoEquipmentFromVault(warbandId: string, equipmentToVaultId: string, sell: boolean) {
     await this.resolveWarband(warbandId);
     return this.repo.undoEquipmentFromWarbandVault(
@@ -103,14 +102,10 @@ export class WarbandsService {
       sell
     );
   }
-
   async fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string) {
     await this.resolveWarband(warbandId);
     return this.repo.fireSoldierFromWarband(warbandId, warbandToSoldierId);
   }
-
-  //helper methods
-
   async resolveWarband(id: string): Promise<Warband> {
     try {
       const warband = await this.repo.findWarbandById(id);
@@ -147,5 +142,8 @@ export class WarbandsService {
           `${soldier.name} Não pode ser contratado por ${warband.faction?.name ?? ``}!`,
         );
       }
+  }
+  async findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]> {
+    return this.repo.findWarbandAvaiableHirings(factionName);
   }
 }
