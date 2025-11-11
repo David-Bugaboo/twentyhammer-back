@@ -403,7 +403,7 @@ export class BussinessRulesService {
     if (hasAtLeastOneDagger && howManyCloseCombatWeapons >= 1) {
       howManyCloseCombatWeapons -= 1;
     }
-    if (equipmentCategory === `Arma Corpo a Corpo`  && howManyCloseCombatWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas arma corpo a corpo!');
+    if ((equipmentCategory === `Arma Corpo a Corpo` || equipmentCategory === `Escudo`)  && howManyCloseCombatWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas arma corpo a corpo!');
     if ((equipmentCategory === `Arma a Distância` || equipmentCategory === `Arma de Fogo`) && howManyRangedWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas armas a distância!');
     if (equipmentCategory === `Armadura` && howManyArmors >= 1) throw new BadRequestException('Figura não pode carregar mais de uma armadura!');
   }
@@ -489,4 +489,5 @@ export class BussinessRulesService {
       throw new BadRequestException('Figura não pode equipar mais de um elmo!');
     }
   }
+
 }
