@@ -36,15 +36,16 @@ let SoldiersService = class SoldiersService {
     }
     async removeEquipmentFromSoldier(soldierId, warbandToSoldierItem) {
         const equipment = await this.queriesService.findEquipmentToWarbandSoldierById(warbandToSoldierItem);
-        await this.warbandRepo.addEquipmentToVault(equipment.warbandSoldier?.warbandId, {
-            equipmentSlug: equipment.equipmentSlug,
-            modifierSlug: equipment.modifierSlug ?? undefined,
-        }, true);
         await this.repo.removeEquipmentFromSoldier(warbandToSoldierItem);
     }
     async addEquipmentToSoldier(soldierId, warbandVaultItem) {
-        const equipment = await this.queriesService.findEquipmentToVaultById(warbandVaultItem);
-        return this.repo.addEquipmentToSoldier(soldierId, equipment);
+        const equipmentToVault = await this.queriesService.findEquipmentToVaultById(warbandVaultItem);
+        const soldier = await this.repo.findSoldierById(soldierId);
+        const soldierCompatibility = soldier.baseFigure?.[0]?.baseFigure?.avaiableEquipment?.map(avaiableEquipment => avaiableEquipment.avaiableEquipmentSlug) ?? [];
+        const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
+        await this.bussinessRulesService.checkForCompatibility(equipmentToVault.equipmentSlug, soldierCompatibility, soldierSkills, equipmentToVault.equipment.category);
+        await this.bussinessRulesService.validateInventorySpace(soldier.equipment, equipmentToVault.equipment.category);
+        return this.repo.addEquipmentToSoldier(soldierId, equipmentToVault);
     }
     async removeEquipmetFromSoldier(warbandToSoldierItemId) {
         return this.repo.removeEquipmentFromSoldier(warbandToSoldierItemId);
@@ -112,36 +113,41 @@ let SoldiersService = class SoldiersService {
         const soldier = await this.repo.findSoldierById(warbandSoldierEquipment.warbandSoldierId);
         const soldierEquipment = soldier.equipment;
         const soldierInjuries = soldier.injuries?.map(injury => injury.injurySlug);
-        const soldierSuperNaturalAbilities = soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [];
-        const soldierMainHand = soldier.equipment?.find(equipment => equipment.mainHandEquiped === true);
-        const soldierOffHand = soldier.equipment?.find(equipment => equipment.offHandEquiped === true);
-        const soldierTwoHanded = soldier.equipment?.find(equipment => equipment.twoHandedEquiped === true);
         const soldierArmor = soldier.equipment?.find(equipment => equipment.armorEquiped === true);
         const soldierHelmet = soldier.equipment?.find(equipment => equipment.helmetEquiped === true);
-        const isMainHandWeaponDebalanced = soldierMainHand ? this.bussinessRulesService.normalizeSpecialRules(soldierMainHand.equipment?.specialRules).some(specialRule => specialRule.label === `Desbalanceada`) : false;
-        await this.bussinessRulesService.validateEquip(warbandSoldierEquipment, soldierEquipment ?? [], soldierSuperNaturalAbilities, soldierInjuries ?? [], slot);
         if (slot === `armorEquiped` && soldierArmor) {
-            await this.repo.unequipGear(soldierArmor.id);
+            await this.bussinessRulesService.validateArmor(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
         if (slot === `helmetEquiped` && soldierHelmet) {
-            await this.repo.unequipGear(soldierHelmet.id);
+            await this.bussinessRulesService.validateHelmet(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
         if (slot === `twoHandedEquiped`) {
-            await this.repo.unequipAllHandsFromSoldier(soldier.id);
+            await this.bussinessRulesService.validateEquipTwoHanded(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
-        if (slot === `offHandEquiped` && soldierOffHand) {
-            await this.repo.unequipGear(soldierOffHand.id);
-            if (soldierMainHand && isMainHandWeaponDebalanced) {
-                await this.repo.unequipGear(soldierMainHand.id);
-            }
+        if (slot === `offHandEquiped`) {
+            await this.bussinessRulesService.validateOffhand(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
-        if (slot === `mainHandEquiped` && soldierMainHand) {
-            await this.repo.unequipGear(soldierMainHand.id);
-            if (soldierOffHand && isMainHandWeaponDebalanced) {
-                await this.repo.unequipGear(soldierOffHand.id);
-            }
+        if (slot === `mainHandEquiped`) {
+            await this.bussinessRulesService.validateMainHand(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
         await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
+    }
+    async unequipItemFromSoldier(equipmentToWarbandSoldierId) {
+        await this.repo.unequipGear(equipmentToWarbandSoldierId);
+    }
+    async unequipSlotFromSoldier(soldierId, slot) {
+        const allowedSlots = [
+            'mainHandEquiped',
+            'offHandEquiped',
+            'twoHandedEquiped',
+            'armorEquiped',
+            'helmetEquiped',
+        ];
+        if (!allowedSlots.includes(slot)) {
+            throw new common_1.BadRequestException('Slot inválido para desequipar.');
+        }
+        await this.repo.findSoldierById(soldierId);
+        await this.repo.unequipSlotFromSoldier(soldierId, slot);
     }
 };
 exports.SoldiersService = SoldiersService;

@@ -16,10 +16,11 @@ export declare class WarbandsController {
         totalPages: number;
         warbands: import("./entities/warband.entity").Warband[];
     }>;
-    findOne(id: string): Promise<import("./entities/warband.entity").Warband>;
+    findOne(id: string, req: Request): Promise<import("./entities/warband.entity").Warband>;
     update(id: string, updateWarbandDto: UpdateWarbandDto): Promise<import("./entities/warband.entity").Warband>;
     remove(id: string): Promise<void>;
     addFigure(id: string, figureSlug: string): Promise<import("./entities/warband.entity").Warband>;
     addEquipmentToVault(id: string, dto: AddEquipmentToVaultDto, loot: string): Promise<import("./entities/warband.entity").Warband>;
     undoEquipmentFromVault(warbandId: string, warbandToVaultItem: string, sell: string): Promise<import("./entities/warband.entity").Warband>;
+    fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<import("./entities/warband.entity").Warband>;
 }

@@ -34,8 +34,12 @@ let WarbandsService = class WarbandsService {
     findAll(query) {
         return this.repo.findAllWarbands(query);
     }
-    findOne(id) {
-        return this.repo.findWarbandById(id);
+    async findOne(id, userId) {
+        const warband = await this.repo.findWarbandById(id);
+        if (warband.userId !== userId) {
+            throw new common_1.ForbiddenException('Você não tem permissão para acessar este bando!');
+        }
+        return warband;
     }
     update(id, updateWarbandDto) {
         return this.repo.updateWarband(id, updateWarbandDto);
@@ -64,6 +68,10 @@ let WarbandsService = class WarbandsService {
     async undoEquipmentFromVault(warbandId, equipmentToVaultId, sell) {
         await this.resolveWarband(warbandId);
         return this.repo.undoEquipmentFromWarbandVault(warbandId, equipmentToVaultId, sell);
+    }
+    async fireSoldierFromWarband(warbandId, warbandToSoldierId) {
+        await this.resolveWarband(warbandId);
+        return this.repo.fireSoldierFromWarband(warbandId, warbandToSoldierId);
     }
     async resolveWarband(id) {
         try {

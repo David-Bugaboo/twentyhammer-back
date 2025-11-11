@@ -23,5 +23,6 @@ export declare class SoldiersPrismaRepository implements SoldiersRepository {
     removeSuperNaturalAbilityFromSoldier(SuperNaturalAbilityToWarbandSoldierId: string): Promise<void>;
     unequipAllHandsFromSoldier(soldierId: string): Promise<void>;
     unequipGear(equipmentToWarbandSoldierId: string): Promise<void>;
+    unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
     equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
 }

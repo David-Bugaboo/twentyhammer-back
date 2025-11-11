@@ -32,6 +32,12 @@ let SoldiersController = class SoldiersController {
     async equipItemToSoldier(equipmentToWarbandSoldierId, slot) {
         await this.soldiersService.equipItemToSoldier(equipmentToWarbandSoldierId, slot);
     }
+    async unequipItemFromSoldier(equipmentToWarbandSoldierId) {
+        await this.soldiersService.unequipItemFromSoldier(equipmentToWarbandSoldierId);
+    }
+    async unequipSlotFromSoldier(soldierId, slot) {
+        await this.soldiersService.unequipSlotFromSoldier(soldierId, slot);
+    }
     async addSpellToSoldier(soldierId, spellSlug) {
         return this.soldiersService.addSpellToSoldier(soldierId, spellSlug);
     }
@@ -101,6 +107,21 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], SoldiersController.prototype, "equipItemToSoldier", null);
+__decorate([
+    (0, common_1.Delete)('equipment/:equipmentToWarbandSoldierId/unequip'),
+    __param(0, (0, common_1.Param)('equipmentToWarbandSoldierId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "unequipItemFromSoldier", null);
+__decorate([
+    (0, common_1.Delete)(':soldierId/equipment-slot/:slot'),
+    __param(0, (0, common_1.Param)('soldierId')),
+    __param(1, (0, common_1.Param)('slot')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "unequipSlotFromSoldier", null);
 __decorate([
     (0, common_1.Post)(':soldierId/spells/:spellSlug'),
     __param(0, (0, common_1.Param)('soldierId')),

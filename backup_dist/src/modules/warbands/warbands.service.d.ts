@@ -19,12 +19,13 @@ export declare class WarbandsService {
         totalPages: number;
         warbands: Warband[];
     }>;
-    findOne(id: string): Promise<Warband>;
+    findOne(id: string, userId: string): Promise<Warband>;
     update(id: string, updateWarbandDto: UpdateWarbandDto): Promise<Warband>;
     remove(id: string): Promise<void>;
     addSoldierToWarband(warbandId: string, soldierSlug: string): Promise<Warband>;
     addEquipmentToVault(warbandId: string, dto: AddEquipmentToVaultDto, loot: boolean): Promise<Warband>;
     undoEquipmentFromVault(warbandId: string, equipmentToVaultId: string, sell: boolean): Promise<Warband>;
+    fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<Warband>;
     resolveWarband(id: string): Promise<Warband>;
     validateFigureAddition(warband: Warband, soldier: BaseFigure): Promise<void>;
 }

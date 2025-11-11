@@ -147,13 +147,28 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
         this.prisma = prisma;
     }
     async create(data, userId, factionSlug, leader) {
+        const isDaggerCompatible = leader.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`);
         const warband = await this.prisma.warband.create({
             data: {
                 ...data,
                 userId,
                 factionSlug,
                 warbandSoldiers: {
-                    create: {
+                    create: isDaggerCompatible ? {
+                        effectiveRole: leader.role,
+                        experience: leader.startingXp ?? 0,
+                        baseFigure: {
+                            create: {
+                                baseFigureSlug: leader.slug,
+                            },
+                        },
+                        equipment: {
+                            create: {
+                                compatible: true,
+                                equipmentSlug: `adaga`
+                            }
+                        }
+                    } : {
                         effectiveRole: leader.role,
                         experience: leader.startingXp ?? 0,
                         baseFigure: {
@@ -212,6 +227,7 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
         });
     }
     async addSoldierToWarband(warbandId, soldier) {
+        const isDaggerCompatible = soldier.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`);
         const updated = await this.prisma.$transaction(async (tx) => {
             const warband = await tx.warband.findUniqueOrThrow({
                 where: {
@@ -225,7 +241,26 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                 where: {
                     id: warbandId,
                 },
-                data: {
+                data: isDaggerCompatible ? {
+                    warbandSoldiers: {
+                        create: {
+                            effectiveRole: soldier.role,
+                            experience: soldier.startingXp ?? 0,
+                            baseFigure: {
+                                create: {
+                                    baseFigureSlug: soldier.slug,
+                                },
+                            },
+                            equipment: {
+                                create: {
+                                    compatible: true,
+                                    equipmentSlug: `adaga`
+                                },
+                            },
+                        },
+                    },
+                    crowns: warband.crowns - soldier.cost,
+                } : {
                     warbandSoldiers: {
                         create: {
                             effectiveRole: soldier.role,
@@ -257,6 +292,40 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                 },
             },
             include: this.defaultWarbandInclude,
+        });
+        return (0, class_transformer_1.plainToInstance)(warband_entity_1.Warband, updated);
+    }
+    async fireSoldierFromWarband(warbandId, warbandToSoldierId) {
+        const updated = await this.prisma.$transaction(async (tx) => {
+            const soldier = await tx.warbandSoldier.findFirstOrThrow({
+                where: {
+                    id: warbandToSoldierId,
+                    warbandId,
+                },
+                include: {
+                    equipment: true,
+                },
+            });
+            if (soldier.equipment.length > 0) {
+                await tx.equipmentToVault.createMany({
+                    data: soldier.equipment.map((equipment) => ({
+                        warbandId,
+                        equipmentSlug: equipment.equipmentSlug,
+                        modifierSlug: equipment.modifierSlug ?? undefined,
+                    })),
+                });
+            }
+            await tx.warbandSoldier.delete({
+                where: {
+                    id: warbandToSoldierId,
+                },
+            });
+            return tx.warband.findUniqueOrThrow({
+                where: {
+                    id: warbandId,
+                },
+                include: this.defaultWarbandInclude,
+            });
         });
         return (0, class_transformer_1.plainToInstance)(warband_entity_1.Warband, updated);
     }

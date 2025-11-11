@@ -188,11 +188,28 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                 where: { id: soldierId },
                 select: {
                     warbandId: true,
+                    baseFigure: {
+                        select: {
+                            baseFigure: {
+                                select: {
+                                    cost: true,
+                                },
+                            }
+                        }
+                    },
                     equipment: {
                         select: {
                             equipmentSlug: true,
                             modifierSlug: true,
                         },
+                    },
+                },
+            });
+            await this.prisma.warband.update({
+                where: { id: soldier.warbandId },
+                data: {
+                    crowns: {
+                        increment: soldier.baseFigure[0].baseFigure.cost,
                     },
                 },
             });
@@ -244,6 +261,17 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                 mainHandEquiped: false,
                 offHandEquiped: false,
                 twoHandedEquiped: false,
+            },
+        });
+    }
+    async unequipSlotFromSoldier(soldierId, slot) {
+        await this.prisma.equipmentToWarbandSoldier.updateMany({
+            where: {
+                warbandSoldierId: soldierId,
+                [slot]: true,
+            },
+            data: {
+                [slot]: false,
             },
         });
     }

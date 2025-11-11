@@ -24,6 +24,7 @@ export declare class WarbandPrismaRepository implements WarbandsRepository {
     deleteWarband(id: string): Promise<void>;
     addSoldierToWarband(warbandId: string, soldier: BaseFigure): Promise<Warband>;
     removeSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<Warband>;
+    fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<Warband>;
     addEquipmentToWarbandVault(warbandId: string, equipment: Equipment, loot: boolean, modifier?: Modifier | null): Promise<Warband>;
     undoEquipmentFromWarbandVault(warbandId: string, equipmentToVaultId: string, sell: boolean): Promise<Warband>;
 }

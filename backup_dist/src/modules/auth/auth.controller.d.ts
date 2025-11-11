@@ -9,21 +9,38 @@ export declare class AuthController {
     create(req: any): any;
     login(loginDto: LoginDto): Promise<{
         data: {
-            name: string;
-            role: import("@prisma/client").$Enums.UserRole;
+            warbands: ({
+                faction: {
+                    id: string;
+                    name: string;
+                    createdAt: Date;
+                    slug: string;
+                };
+            } & {
+                id: string;
+                name: string;
+                createdAt: Date;
+                crowns: number;
+                wyrdstone: number;
+                factionSlug: string;
+                userId: string;
+            })[];
+        } & {
             id: string;
-            createdAt: Date;
+            name: string;
             email: string;
+            createdAt: Date;
             updatedAt: Date;
+            role: import("@prisma/client").$Enums.UserRole;
         };
         token: string;
     }>;
     register(registerDto: RegisterDto): Promise<{
-        name: string;
-        role: import("@prisma/client").$Enums.UserRole;
         id: string;
-        createdAt: Date;
+        name: string;
         email: string;
+        createdAt: Date;
         updatedAt: Date;
+        role: import("@prisma/client").$Enums.UserRole;
     }>;
 }

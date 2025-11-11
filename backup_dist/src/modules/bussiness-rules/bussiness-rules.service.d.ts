@@ -19,10 +19,7 @@ export declare class BussinessRulesService {
     ValidateModifier(modifier: Modifier, equipment: Equipment): Promise<void>;
     validateIfBuyIsValid(warband: Warband, equipment: Equipment, loot: boolean, modifier?: Modifier | null): Promise<void>;
     resolveEquipmentToWarbandSoldier(id: string): Promise<EquipmentToWarbandSoldier>;
-    checkForCompatibility(equipmentSlug: string, soldierCompatibility: string[], soldierSkills: string[], equipmentCategory: string, specialRules: {
-        label: string;
-        value: string;
-    }[]): Promise<boolean>;
+    checkForCompatibility(equipmentSlug: string, soldierCompatibility: string[], soldierSkills: string[], equipmentCategory: string): Promise<true | undefined>;
     validateSkill(skillSlug: string, warbandSoldierSkills: string[], warbandSoldierSkillLists: string[]): Promise<void>;
     validateSpell(spellSlug: string, warbandSoldierSpellLores: string[], warbandSoldierSpells: string[], warbandSoldierSkills: string[]): Promise<void>;
     validateAddedAdvancement(advancementSlug: string, warbandSoldierAdvancements: string[]): Promise<void>;
@@ -30,4 +27,10 @@ export declare class BussinessRulesService {
     validateInjury(injurySlug: string, warbandSoldierInjuries: string[], warbandSoldierRole: Role): Promise<void>;
     validateAdvancement(advancementSlug: string, warbandSoldierAdvancements: string[], warbandSoldierRole: Role): Promise<void>;
     validateEquip(warbandSoldierEquipment: EquipmentToWarbandSoldier, warbandSoldierEquipmentList: EquipmentToWarbandSoldier[], warbandSoldierSuperNaturalAbilities: string[], warbandSoldierInjuries: string[], hand: string): Promise<void>;
+    validateInventorySpace(warbandSoldierEquipmentList: EquipmentToWarbandSoldier[], equipmentCategory: string): Promise<void>;
+    validateEquipTwoHanded(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void>;
+    validateOffhand(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void>;
+    validateMainHand(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void>;
+    validateArmor(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void>;
+    validateHelmet(equipment: Equipment, warbandSoldierMutations: string[], warbandSoldierInjuries: string[], warbandSoldierEquipmentList: EquipmentToWarbandSoldier[]): Promise<void>;
 }

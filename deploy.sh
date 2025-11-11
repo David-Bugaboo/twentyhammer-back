@@ -19,6 +19,13 @@ npm -v || echo "NPM não disponível"
 cd /root/twentyhammer-back
 git pull origin main
 
+echo "📦 Instalando dependências..."
+npm install
+
+echo "🔍 executando sincronização de dados..."
+npx prisma db push
+
+
 # Backup da última build estável
 if [ -d dist ]; then
   echo "🧩 Salvando backup da build anterior..."
@@ -26,9 +33,16 @@ if [ -d dist ]; then
   cp -r dist backup_dist
 fi
 
-echo "🏗️  Gerando nova build..."
+echo "🛠️ Gerando nova build..."
 if npm run build; then
   echo "✅ Build concluída com sucesso!"
 else
-  echo "❌ Build falhou! Restaurando versão anterior."
+  echo "❌ Build falhou! Restaurando versão anterior..."
+  rm -rf dist
+  mv backup_dist dist
+fi
 
+echo "🚀 Reiniciando serviço PM2..."
+pm2 restart twentyhammer-back || pm2 start dist/src/main.js --name twentyhammer-back
+
+echo "✅ Deploy concluído com sucesso!"

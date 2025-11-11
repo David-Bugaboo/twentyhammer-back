@@ -18,6 +18,7 @@ export declare abstract class WarbandsRepository {
     abstract deleteWarband(id: string): Promise<void>;
     abstract addSoldierToWarband(warbandId: string, soldier: BaseFigure): Promise<Warband>;
     abstract removeSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<Warband>;
+    abstract fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<Warband>;
     abstract addEquipmentToWarbandVault(warbandId: string, equipment: Equipment, loot: boolean, modifier?: Modifier | null): Promise<Warband>;
     abstract undoEquipmentFromWarbandVault(warbandId: string, equipmentToVaultId: string, sell: boolean): Promise<Warband>;
 }

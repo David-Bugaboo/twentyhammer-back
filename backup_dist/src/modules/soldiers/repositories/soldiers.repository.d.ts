@@ -19,5 +19,6 @@ export declare abstract class SoldiersRepository {
     abstract removeSuperNaturalAbilityFromSoldier(SuperNaturalAbilityToWarbandSoldierId: string): Promise<void>;
     abstract unequipAllHandsFromSoldier(soldierId: string): Promise<void>;
     abstract unequipGear(equipmentToWarbandSoldierId: string): Promise<void>;
+    abstract unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
     abstract equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
 }

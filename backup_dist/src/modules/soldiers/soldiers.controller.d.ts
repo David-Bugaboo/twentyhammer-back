@@ -6,6 +6,8 @@ export declare class SoldiersController {
     addEquipmentToSoldier(soldierId: string, warbandVaultItemId: string): Promise<void>;
     removeEquipmentFromSoldier(soldierId: string, warbandToSoldierItemId: string): Promise<void>;
     equipItemToSoldier(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
+    unequipItemFromSoldier(equipmentToWarbandSoldierId: string): Promise<void>;
+    unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
     addSpellToSoldier(soldierId: string, spellSlug: string): Promise<void>;
     removeSpellFromSoldier(warbandSoldierSpellId: string): Promise<void>;
     addSkillToSoldier(soldierId: string, skillSlug: string): Promise<void>;

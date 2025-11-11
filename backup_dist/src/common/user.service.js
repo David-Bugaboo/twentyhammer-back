@@ -44,6 +44,13 @@ let UsersService = class UsersService {
             where: {
                 email,
             },
+            include: {
+                warbands: {
+                    include: {
+                        faction: true,
+                    },
+                },
+            }
         });
         return user;
     }

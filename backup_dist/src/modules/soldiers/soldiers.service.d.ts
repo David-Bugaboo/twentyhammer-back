@@ -25,4 +25,6 @@ export declare class SoldiersService {
     addSuperNaturalAbilityToSoldier(soldierId: string, superNaturalAbilitySlug: string): Promise<void>;
     removeSuperNaturalAbilityFromSoldier(superNaturalAbilityToWarbandSoldierId: string): Promise<void>;
     equipItemToSoldier(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
+    unequipItemFromSoldier(equipmentToWarbandSoldierId: string): Promise<void>;
+    unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
 }

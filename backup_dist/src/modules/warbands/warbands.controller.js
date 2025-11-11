@@ -39,8 +39,8 @@ let WarbandsController = class WarbandsController {
     findAll(query) {
         return this.warbandsService.findAll(query);
     }
-    findOne(id) {
-        return this.warbandsService.findOne(id);
+    findOne(id, req) {
+        return this.warbandsService.findOne(id, req.user.id);
     }
     update(id, updateWarbandDto) {
         return this.warbandsService.update(id, updateWarbandDto);
@@ -60,6 +60,9 @@ let WarbandsController = class WarbandsController {
         const boolSell = sell === 'true' ? true : false;
         console.log(sell);
         return this.warbandsService.undoEquipmentFromVault(warbandId, warbandToVaultItem, boolSell);
+    }
+    fireSoldierFromWarband(warbandId, warbandToSoldierId) {
+        return this.warbandsService.fireSoldierFromWarband(warbandId, warbandToSoldierId);
     }
 };
 exports.WarbandsController = WarbandsController;
@@ -81,10 +84,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], WarbandsController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], WarbandsController.prototype, "findOne", null);
 __decorate([
@@ -131,6 +136,15 @@ __decorate([
     __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", void 0)
 ], WarbandsController.prototype, "undoEquipmentFromVault", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)(':warbandId/fire/:warbandToSoldierId'),
+    __param(0, (0, common_1.Param)('warbandId')),
+    __param(1, (0, common_1.Param)('warbandToSoldierId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], WarbandsController.prototype, "fireSoldierFromWarband", null);
 exports.WarbandsController = WarbandsController = __decorate([
     (0, common_1.Controller)('warbands'),
     __metadata("design:paramtypes", [warbands_service_1.WarbandsService,

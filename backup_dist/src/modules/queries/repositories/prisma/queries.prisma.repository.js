@@ -193,7 +193,51 @@ let QueriesPrismaRepository = class QueriesPrismaRepository {
         });
     }
     async findFactionByslug(slug) {
-        return this.prisma.faction.findUniqueOrThrow({ where: { slug } });
+        return this.prisma.faction.findUniqueOrThrow({
+            where: { slug },
+            include: {
+                figures: {
+                    include: {
+                        avaiableEquipment: {
+                            include: {
+                                avaiableEquipment: true,
+                            },
+                        },
+                        raceLimits: true,
+                        skillLists: {
+                            include: {
+                                skillList: true,
+                            },
+                        },
+                        spellLores: {
+                            include: {
+                                spellLore: true,
+                            },
+                        },
+                        legendStartingEquipment: {
+                            include: {
+                                equipment: true,
+                            },
+                        },
+                        legendStartingSkills: {
+                            include: {
+                                skill: true,
+                            },
+                        },
+                        legendStartingSpells: {
+                            include: {
+                                spell: true,
+                            },
+                        },
+                        mercenaryStartingEquipment: {
+                            include: {
+                                equipment: true,
+                            },
+                        },
+                    }
+                }
+            }
+        });
     }
     async findAllBaseFigures(dto) {
         const rows = await this.prisma.baseFigure.findMany({
