@@ -127,6 +127,10 @@ export class WarbandsService {
     const isMercOrLegend = soldier.role === `MERCENARIO` || soldier.role === `LENDA`;
     const isInInclusions = soldier.avaiability.includes(warband.faction?.name ?? ``) || soldier.avaiability.includes(`Todos`);
     const isInExclusions = soldier.exclusions.includes(warband.faction?.name ?? ``) 
+
+    console.log(warband.faction?.name);
+    console.log(isInInclusions);
+    console.log(isInExclusions);
     if (warband.crowns < soldier.cost) {
       throw new BadRequestException(
         `Coroas insuficientes para comorar ${soldier.name}!`,
