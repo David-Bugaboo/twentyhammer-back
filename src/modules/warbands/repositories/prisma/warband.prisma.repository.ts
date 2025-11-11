@@ -138,12 +138,12 @@ export class WarbandPrismaRepository implements WarbandsRepository {
             skillList: true,
           },
         },
-        extraSkillLists: {
+        extraSkillsLists: {
           include: {
             skillList: true,
           },
         },
-        extraSpellLores: {
+        extraSpellsLores: {
           include: {
             spellLore: true,
           }
