@@ -122,16 +122,26 @@ export class WarbandsService {
   async validateFigureAddition(
     warband: Warband,
     soldier: BaseFigure,
+
   ): Promise<void> {
+    const isMercOrLegend = soldier.role === `MERCENARIO` || soldier.role === `LENDA`;
+    const isInInclusions = soldier.avaiability.includes(warband.faction?.name ?? ``) || soldier.avaiability.includes(`Todos`);
+    const isInExclusions = soldier.exclusions.includes(warband.faction?.name ?? ``) 
     if (warband.crowns < soldier.cost) {
       throw new BadRequestException(
         `Coroas insuficientes para comorar ${soldier.name}!`,
       );
     }
-    if (warband.factionSlug !== soldier.factionSlug) {
+    if (warband.factionSlug !== soldier.factionSlug && !isMercOrLegend) {
       throw new BadRequestException(
         `${soldier.name} não pertence à facção ${warband.factionSlug}!`,
       );
+
     }
+     if (isMercOrLegend && isInInclusions && !isInExclusions) {
+        throw new BadRequestException(
+          `${soldier.name} Não pode ser contratado por ${warband.faction?.name ?? ``}!`,
+        );
+      }
   }
 }
