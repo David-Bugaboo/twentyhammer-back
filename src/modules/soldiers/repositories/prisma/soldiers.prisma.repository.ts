@@ -304,11 +304,9 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     });
   }
   async removeExtraSkillListFromSoldier(soldierId: string, skillListSlug: string): Promise<void> {
-    await this.prisma.warbandSoldier.update({
-      where: { id: soldierId },
-      data: {
-        extraSkillsLists: { deleteMany: { skillListSlug: skillListSlug } },
-      },
+    await this.prisma.warbanSoldierToSKillLists.deleteMany({
+      where: { warbandSoldierId: soldierId, skillListSlug: skillListSlug },
+      
     });
   }
   async addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void> {
@@ -320,11 +318,8 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     });
   }
   async removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void> {
-    await this.prisma.warbandSoldier.update({
-      where: { id: soldierId },
-      data: {
-        extraSpellsLores: { deleteMany: { spellLoreSlug: spellLoreSlug } },
-      },
+    await this.prisma.warbandSoldierToSpellsLores.deleteMany({
+      where: { warbandSoldierId: soldierId, spellLoreSlug: spellLoreSlug },
     });
   }
 }
