@@ -22,6 +22,7 @@ import { FactionQueryDto } from '../dto/faction-query.dto';
 import { BaseFigureQueryDto } from '../dto/base-figure-query.dto';
 import { EquipmentToWarbandSoldier } from 'src/modules/soldiers/entities/equipment-to-warband-soldier.entity';
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
+import { SkillToWarbandSoldier } from 'src/modules/soldiers/entities/skill-to-warband-soldier.entity';
 
 export abstract class QueriesRepository {
   //spell-related-stuff
@@ -67,5 +68,5 @@ export abstract class QueriesRepository {
     id: string,
   ): Promise<EquipmentToWarbandSoldier>;
   abstract findEquipmentToVaultById(id: string): Promise<EquipmentToVault>;
- 
+  abstract findSkillToWarbandSoldierById(id: string): Promise<SkillToWarbandSoldier>;
 }

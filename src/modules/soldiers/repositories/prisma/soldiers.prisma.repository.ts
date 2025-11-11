@@ -295,4 +295,36 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       },
     });
   }
+  async addExtraSkillListToSoldier(soldierId: string, skillListSlug: string, source: string): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        extraSkillsLists: { create: { skillListSlug: skillListSlug, source:source } },
+      },
+    });
+  }
+  async removeExtraSkillListFromSoldier(soldierId: string, skillListSlug: string): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        extraSkillsLists: { deleteMany: { skillListSlug: skillListSlug } },
+      },
+    });
+  }
+  async addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        extraSpellsLores: { create: { spellLoreSlug: spellLoreSlug, source:source } },
+      },
+    });
+  }
+  async removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        extraSpellsLores: { deleteMany: { spellLoreSlug: spellLoreSlug } },
+      },
+    });
+  }
 }

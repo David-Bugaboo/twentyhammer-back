@@ -56,14 +56,28 @@ export class SoldiersService {
   }
   async addSkillToSoldier(soldierId: string, skillSlug: string) {
     const soldier = await this.repo.findSoldierById(soldierId);
-    const soldierPromotedHeroSkillLists = soldier.promotedHeroSkillLists?.map(skillList => skillList.skillListSlug) ?? [];
+    const soldierExtraSkillLists = soldier.extraSkillLists?.map(skillList => skillList.skillListSlug) ?? [];
     const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
     const soldierSkillLists = soldier.baseFigure?.[0]?.baseFigure?.skillLists?.map(skillList => skillList.skillListSlug) ?? [];
-    await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills,  [...soldierSkillLists, ...soldierPromotedHeroSkillLists]);
+    await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists]);
+    
+    if (skillSlug === 'corpo-treinado') {
+      await this.repo.addExtraSkillListToSoldier(soldierId, 'forca', `Corpo Treinado`  )
+    }
+
+    if(skillSlug === 'aprendizado-arcano') {
+      await this.repo.addExtraSpellLoreToSoldier(soldierId, 'magia-inferior', `Aprendizado Arcano`  )
+    }
+
+
+
+
     return this.repo.addSkillToSoldier(soldierId, skillSlug);
   }
   async removeSpellFromSoldier(warbandSoldierSpellId: string) {
     return this.repo.removeSpellFromSoldier(warbandSoldierSpellId);
+
+    
   }
   async removeSkillFromSoldier(warbandToSoldierItemId: string) {
     return this.repo.removeSkillFromSoldier(warbandToSoldierItemId);
