@@ -54,6 +54,7 @@ model BaseFigure {
   lore                        String                       @map("lore")
   avaiability                 String[]                     @map("avaiability")
   exclusions                  String[]                     @map("exclusions")
+  upkeep                      String?
   quality                     Int                          @default(0) @map("quality")
   race                        String?                      @map("race")
   factionSlug                 String?                      @map("faction_slug")
