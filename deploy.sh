@@ -19,6 +19,12 @@ npm -v || echo "NPM não disponível"
 cd /root/twentyhammer-back
 git pull origin main
 
+echo "🔍 instalando dependências..."
+npm install
+
+echo "🔍 executando sincronização de dados..."
+npx prisma db push
+
 # Backup da última build estável
 if [ -d dist ]; then
   echo "🧩 Salvando backup da build anterior..."

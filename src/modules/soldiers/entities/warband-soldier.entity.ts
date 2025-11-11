@@ -42,7 +42,6 @@ export class WarbandSoldier {
   @Type(() => SuperNaturalAbilityToWarbandSoldier)
   supernaturalAbilities?: SuperNaturalAbilityToWarbandSoldier[];
   @Type(() => PromotedHeroSkillLists)
-  promotedHeroSkillLists?: PromotedHeroSkillLists[];
   @Type(() => Warband)
   warband?: Warband;
 }

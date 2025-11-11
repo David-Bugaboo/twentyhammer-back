@@ -31,4 +31,8 @@ export abstract class SoldiersRepository {
     slot: string,
   ): Promise<void>;
   abstract equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
+  abstract addExtraSkillListToSoldier(soldierId: string, skillListSlug: string, source: string): Promise<void>;
+  abstract removeExtraSkillListFromSoldier(soldierId: string, skillListSlug: string): Promise<void>;
+  abstract addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void>;
+  abstract removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void>;
 }
