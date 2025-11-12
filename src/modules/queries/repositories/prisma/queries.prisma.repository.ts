@@ -206,7 +206,7 @@ export class QueriesPrismaRepository implements QueriesRepository {
         category: dto.category ? { equals: dto.category } : undefined,
         effect: dto.effect ? { contains: dto.effect } : undefined,
         multiplier:
-          Number(dto.multiplier) ?? undefined,
+          dto.multiplier ? { equals: Number(dto.multiplier) } : undefined,
       },
     });
   }
