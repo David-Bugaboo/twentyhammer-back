@@ -275,6 +275,15 @@ export class WarbandPrismaRepository implements WarbandsRepository {
             create: {
               effectiveRole: soldier.role as Role,
               experience: soldier.startingXp ?? 0,
+              miscModifiers: {
+              "move": 0,
+              "will": 0,
+              "fight": 0,
+              "shoot": 0,
+              "armour": 0,
+              "health": 0,
+              "strength": 0
+              },
               baseFigure: {
                 create: {
                   baseFigureSlug: soldier.slug,
