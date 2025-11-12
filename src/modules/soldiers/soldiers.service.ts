@@ -148,7 +148,7 @@ export class SoldiersService {
     }
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
     
-    const twoWeaponFighting = this.bussinessRulesService.checkIfTwoWeaponFighting(soldier.equipment ?? [], soldier.skills ?? [], soldier.injuries ?? [], soldier.supernaturalAbilities ?? []);
+    const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldier.id);
 
     await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
     
@@ -156,9 +156,10 @@ export class SoldiersService {
   async unequipItemFromSoldier(equipmentToWarbandSoldierId: string) {
     const warbandSoldierEquipment = await this.queriesService.findEquipmentToWarbandSoldierById(equipmentToWarbandSoldierId);
     const soldier = await this.repo.findSoldierById(warbandSoldierEquipment.warbandSoldierId);
+    await this.repo.unequipGear(equipmentToWarbandSoldierId);
     const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldier.id);
     await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
-    await this.repo.unequipGear(equipmentToWarbandSoldierId);
+
   }
 
   async defineIfTwoWeaponFighting(soldierId: string) {
@@ -181,16 +182,9 @@ export class SoldiersService {
     if (!allowedSlots.includes(slot)) {
       throw new BadRequestException('Slot inválido para desequipar.');
     }
-
-
     await this.repo.unequipSlotFromSoldier(soldierId, slot);
-
-    
     const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldierId);
     await this.repo.updateSoldier(soldierId, { twoWeaponFighting });
-
-   
-
   }
   
 }
