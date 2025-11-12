@@ -452,6 +452,8 @@ model Skill {
   skillList             SkillList               @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
   attributeModifiers    Json?                   @map("attribute_modifiers")
   extraNaturalAttack    Json?                   @map("natural_attack")
+  extraSkillLists       String[]                  @map("extra_skill_lists")
+  extraSpellLores       String[]                  @map("extra_spell_lores")
 
   @@map("skills")
 }
