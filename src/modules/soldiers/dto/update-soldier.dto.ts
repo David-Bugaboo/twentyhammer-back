@@ -26,5 +26,5 @@ export class UpdateSoldierDto {
     @ValidateNested({ each: true })
     @IsOptional()
     @Type(() => MiscModifiersDto)
-    modifiers?: MiscModifiersDto[];
+    miscModifiers?: MiscModifiersDto[];
 }
