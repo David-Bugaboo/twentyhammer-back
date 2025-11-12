@@ -501,13 +501,11 @@ export class BussinessRulesService {
     const isUnarmed = equipment.every(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === false && equipmentToWarbandSoldier.offHandEquiped === false && equipmentToWarbandSoldier.twoHandedEquiped === false);
     const mainHandEquipment = equipment.find(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true);
     const mainHandEquipmentIsDesbalanced = this.normalizeSpecialRules(mainHandEquipment?.equipment?.specialRules).some(rule => rule.label === `Desbalanceada`);
-
     if (hasOffHandedBlocked) return false;
-    
-    if (!offHandEquipment || offHandIsShield || !mainHandEquipment || mainHandEquipmentIsDesbalanced) return false;
-
     if(isUnarmed && hasArteDaMorteSilenciosa) return true;
-    
+    if (!mainHandEquipment || !offHandEquipment) return false;
+    if (mainHandEquipment && mainHandEquipmentIsDesbalanced) return false;
+    if (offHandEquipment && offHandIsShield) return false;
     return true;
   }
 }
