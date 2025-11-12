@@ -499,10 +499,12 @@ export class BussinessRulesService {
     const offHandIsShield = offHandEquipment?.equipment?.category === `Escudo`;
     const hasArteDaMorteSilenciosa = skills.some(skill => skill.skill?.slug === `arte-da-morte-silenciosa`);
     const isUnarmed = equipment.every(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === false && equipmentToWarbandSoldier.offHandEquiped === false && equipmentToWarbandSoldier.twoHandedEquiped === false);
+    const mainHandEquipment = equipment.find(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true);
+    const mainHandEquipmentIsDesbalanced = this.normalizeSpecialRules(mainHandEquipment?.equipment?.specialRules).some(rule => rule.label === `Desbalanceada`);
 
     if (hasOffHandedBlocked) return false;
     
-    if (!offHandEquipment || offHandIsShield) return false;
+    if (!offHandEquipment || offHandIsShield || !mainHandEquipment || mainHandEquipmentIsDesbalanced) return false;
 
     if(isUnarmed && hasArteDaMorteSilenciosa) return true;
     

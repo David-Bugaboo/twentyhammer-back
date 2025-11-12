@@ -1,7 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSoldierDto } from './create-soldier.dto';
+
 import * as baseFigureEntity from 'src/entities/base-figure.entity';
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsObject, isObject, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { MiscModifiersDto } from './miscModifiers.dto';
+import { Type } from 'class-transformer';
 
 
 export class UpdateSoldierDto {
@@ -21,4 +22,9 @@ export class UpdateSoldierDto {
     @IsOptional()
     @MaxLength(255)
     notes?: string;
+    @IsObject()
+    @ValidateNested({ each: true })
+    @IsOptional()
+    @Type(() => MiscModifiersDto)
+    modifiers?: MiscModifiersDto[];
 }

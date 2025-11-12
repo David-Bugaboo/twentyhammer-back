@@ -129,6 +129,8 @@ export class SoldiersService {
     const soldierInjuries = soldier.injuries?.map(injury => injury.injurySlug)
     const soldierArmor = soldier.equipment?.find(equipment => equipment.armorEquiped === true); 
     const soldierHelmet = soldier.equipment?.find(equipment => equipment.helmetEquiped === true); 
+    
+    
     if (slot === `armorEquiped` && soldierArmor) { 
       await this.bussinessRulesService.validateArmor(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
     }
@@ -146,13 +148,26 @@ export class SoldiersService {
     }
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
     
-    const twoWeaponFighting = await this.bussinessRulesService.checkIfTwoWeaponFighting(soldier.equipment ?? [], soldier.skills ?? [], soldier.injuries ?? [], soldier.supernaturalAbilities ?? []);
+    const twoWeaponFighting = this.bussinessRulesService.checkIfTwoWeaponFighting(soldier.equipment ?? [], soldier.skills ?? [], soldier.injuries ?? [], soldier.supernaturalAbilities ?? []);
 
     await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
     
   }
   async unequipItemFromSoldier(equipmentToWarbandSoldierId: string) {
+    const warbandSoldierEquipment = await this.queriesService.findEquipmentToWarbandSoldierById(equipmentToWarbandSoldierId);
+    const soldier = await this.repo.findSoldierById(warbandSoldierEquipment.warbandSoldierId);
+    const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldier.id);
+    await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
     await this.repo.unequipGear(equipmentToWarbandSoldierId);
+  }
+
+  async defineIfTwoWeaponFighting(soldierId: string) {
+    const soldier = await this.repo.findSoldierById(soldierId);
+    const soldierEquipment = soldier.equipment ?? []
+    const soldierInjuries = soldier.injuries ?? []
+    const soldierSkills = soldier.skills ?? [];
+    const soldierSuperNaturalAbilities = soldier.supernaturalAbilities ?? []
+    return await this.bussinessRulesService.checkIfTwoWeaponFighting(soldierEquipment ?? [], soldierSkills ?? [], soldierInjuries ?? [], soldierSuperNaturalAbilities ?? []);
   }
   async unequipSlotFromSoldier(soldierId: string, slot: string) {
     const allowedSlots = [
@@ -167,8 +182,15 @@ export class SoldiersService {
       throw new BadRequestException('Slot inválido para desequipar.');
     }
 
-    await this.repo.findSoldierById(soldierId);
+
     await this.repo.unequipSlotFromSoldier(soldierId, slot);
+
+    
+    const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldierId);
+    await this.repo.updateSoldier(soldierId, { twoWeaponFighting });
+
+   
+
   }
   
 }
