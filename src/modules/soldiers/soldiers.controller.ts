@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, Body, Patch } from '@nestjs/common';
 import { SoldiersService } from './soldiers.service';
+import { UpdateSoldierDto } from './dto/update-soldier.dto';
 
 @Controller('soldiers')
 export class SoldiersController {
@@ -145,5 +146,13 @@ export class SoldiersController {
     await this.soldiersService.removeSuperNaturalAbilityFromSoldier(
       superNaturalAbilityToWarbandSoldierId,
     );
+  }
+
+  @Patch(':soldierId')
+  async updateSoldier(
+    @Param('soldierId') soldierId: string,
+    @Body() updateSoldierDto: UpdateSoldierDto,
+  ) {
+    await this.soldiersService.updateSoldier(soldierId, updateSoldierDto);
   }
 }
