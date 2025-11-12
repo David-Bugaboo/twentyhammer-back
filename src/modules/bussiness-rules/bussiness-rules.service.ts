@@ -291,8 +291,8 @@ export class BussinessRulesService {
     const supernaturalAbilityRepeated =
       isRepeatedAbility && !isIgnoredRepetition;
     const canPickMutation =
-      warbandSoldierBaseFigure.canGetMutations &&
-      !warbandSoldierSkills.includes(`linhagem-corrompida`);
+      warbandSoldierBaseFigure.canGetMutations ||
+      warbandSoldierSkills.includes(`linhagem-corrompida`);
     const canPickBlessing = warbandSoldierBaseFigure.canGetBlessings;
     const canPickSacredMark = warbandSoldierBaseFigure.canGetSacredMarks;
     const superNaturalAbility =
