@@ -394,7 +394,7 @@ model SuperNaturalAbility {
   category                            String                                @map("category")
   createdAt                           DateTime                              @default(now()) @map("created_at")
   superNaturalAbilityToWarbandSoldier SuperNaturalAbilityToWarbandSoldier[]
-
+  attributeModifiers    Json?                   @map("attribute_modifiers")
   @@map("super_natural_abilities")
 }
 
@@ -405,7 +405,7 @@ model Injury {
   description            String                   @map("description")
   createdAt              DateTime                 @default(now()) @map("created_at")
   injuryToWarbandSoldier InjuryToWarbandSoldier[]
-
+  attributeModifiers    Json?                   @map("attribute_modifiers")
   @@map("injuries")
 }
 
@@ -416,6 +416,7 @@ model Advancement {
   description                 String                        @map("description")
   createdAt                   DateTime                      @default(now()) @map("created_at")
   advancementToWarbandSoldier AdvancementToWarbandSoldier[]
+  attributeModifiers    Json?                   @map("attribute_modifiers")
 
   @@map("advancements")
 }
@@ -446,6 +447,7 @@ model Skill {
   legendStartingSkills  LegendStartingSkills[]
   skillToWarbandSoldier SkillToWarbandSoldier[]
   skillList             SkillList               @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
+  attributeModifiers    Json?                   @map("attribute_modifiers")
 
   @@map("skills")
 }

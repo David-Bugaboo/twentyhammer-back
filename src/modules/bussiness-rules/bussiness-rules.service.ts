@@ -12,6 +12,10 @@ import { Warband } from '../warbands/entities/warband.entity';
 import { EquipmentToWarbandSoldier } from '../soldiers/entities/equipment-to-warband-soldier.entity';
 import { Spell } from 'src/entities/spell.entity';
 import { Skill } from 'src/entities/skill.entity';
+import { WarbandSoldier } from '../soldiers/entities/warband-soldier.entity';
+import { InjuryToWarbandSoldier } from '../soldiers/entities/injury-to-warband-soldier.entity';
+import { SkillToWarbandSoldier } from '../soldiers/entities/skill-to-warband-soldier.entity';
+import { SuperNaturalAbilityToWarbandSoldier } from '../soldiers/entities/super-natural-ability-to-warband-soldier.entity';
 
 @Injectable()
 export class BussinessRulesService {
@@ -489,5 +493,4 @@ export class BussinessRulesService {
       throw new BadRequestException('Figura não pode equipar mais de um elmo!');
     }
   }
-
 }

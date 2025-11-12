@@ -81,7 +81,7 @@ describe('WarbandsService', () => {
     const loot = false;
 
     repository.findWarbandById.mockResolvedValue(warband as any);
-    repository.addEquipmentToWarbandVault.mockResolvedValue(undefined);
+
     businessRules.resolveEquipment.mockResolvedValue(equipment as any);
     businessRules.resolveModifier.mockResolvedValue(modifier as any);
     businessRules.ValidateModifier.mockResolvedValue(undefined);
