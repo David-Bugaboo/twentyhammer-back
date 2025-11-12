@@ -1,6 +1,7 @@
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
 import { WarbandSoldier } from '../entities/warband-soldier.entity';
 import { PromotedHeroSkillLists } from '../entities/promoted-hero-skill-list.entity';
+import { UpdateSoldierDto } from '../dto/update-soldier.dto';
 
 export abstract class SoldiersRepository {
   abstract removeSoldierFromWarband(soldierId: string, kill: boolean);
@@ -35,4 +36,5 @@ export abstract class SoldiersRepository {
   abstract removeExtraSkillListFromSoldier(soldierId: string, skillListSlug: string): Promise<void>;
   abstract addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void>;
   abstract removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void>;
+  abstract updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
 }

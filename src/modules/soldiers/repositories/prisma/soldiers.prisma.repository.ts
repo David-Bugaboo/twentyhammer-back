@@ -5,6 +5,7 @@ import { WarbandSoldier } from '../../entities/warband-soldier.entity';
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
 import { EquipmentToWarbandSoldier } from '../../entities/equipment-to-warband-soldier.entity';
 import { PromotedHeroSkillLists } from '../../entities/promoted-hero-skill-list.entity';
+import { UpdateSoldierDto } from '../../dto/update-soldier.dto';
 
 @Injectable()
 export class SoldiersPrismaRepository implements SoldiersRepository {
@@ -99,13 +100,26 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       },
     });
   }
-  async addSkillToSoldier(soldierId:string, skillSlug:string): Promise<void> {
+  async addSkillToSoldier(soldierId: string, skillSlug: string): Promise<void> {
+    const skill = await this.prisma.skill.findUniqueOrThrow({
+      where: { slug: skillSlug },
+    });
      await this.prisma.warbandSoldier.update({
       where: { id: soldierId },
       data: {
         skills: {
           create: { skillSlug: skillSlug },
         },
+        extraSkillsLists: {
+          createMany: {
+            data: skill.extraSkillLists?.map(skillList => ({ skillListSlug: skillList, source:skill.name })) ?? [],
+          }
+        },
+        extraSpellsLores: {
+          createMany: {
+            data: skill.extraSpellLores?.map(spellLore => ({ spellLoreSlug: spellLore, source:skill.name })) ?? [],
+          }
+        },  
       },
     });
   }
@@ -177,8 +191,24 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     });
   }
   async removeSkillFromSoldier(SkillToWarbandSoldierId: string): Promise<void> {
-    await this.prisma.skillToWarbandSoldier.delete({
-      where: { id: SkillToWarbandSoldierId },
+    await this.prisma.$transaction(async (tx) => {
+      const skillToWarbandSoldier = await tx.skillToWarbandSoldier.findUniqueOrThrow({
+        where: { id: SkillToWarbandSoldierId },
+      });
+      const skill = await tx.skill.findUniqueOrThrow({
+        where: { slug: skillToWarbandSoldier.skillSlug },
+      });
+      await tx.warbandSoldier.update({
+        where: { id: skillToWarbandSoldier.warbandSoldierId },
+        data: {
+          skills: { delete: { id: SkillToWarbandSoldierId } },  
+          extraSkillsLists: { deleteMany: skill.extraSkillLists?.map(skillList => ({ skillListSlug: skillList })) ?? [] },
+          extraSpellsLores: { deleteMany: skill.extraSpellLores?.map(spellLore => ({ spellLoreSlug: spellLore })) ?? [] },
+        },
+      });
+      await tx.skillToWarbandSoldier.delete({
+          where: { id: SkillToWarbandSoldierId },
+        });
     });
   }
   async killSoldier(soldierId: string): Promise<void> {
@@ -323,6 +353,12 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
   async removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void> {
     await this.prisma.warbandSoldierToSpellsLores.deleteMany({
       where: { warbandSoldierId: soldierId, spellLoreSlug: spellLoreSlug },
+    });
+  }
+  async updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: updateSoldierDto,
     });
   }
 }

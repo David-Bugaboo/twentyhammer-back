@@ -242,8 +242,10 @@ model Modifier {
 model WarbandSoldier {
   id                     String                                @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   campaignName           String?                               @map("campaign_name")
+  notes                  String?
   effectiveRole          Role                                  @default(HEROI) @map("effective_role")
   warbandId              String                                @map("warband_id")
+  twoWeaponFighting      Boolean                               @default(false) @map("two_weapon_fighting")
   experience             Int                                   @default(0) @map("experience")
   createdAt              DateTime                              @default(now()) @map("created_at")
   extraSpecialRules      Json?                                 @map("extra_special_rules")

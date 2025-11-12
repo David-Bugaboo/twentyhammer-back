@@ -3,6 +3,7 @@ import { SoldiersRepository } from './repositories/soldiers.repository';
 import { WarbandsService } from '../warbands/warbands.service';
 import { QueriesService } from '../queries/queries.service';
 import { BussinessRulesService } from '../bussiness-rules/bussiness-rules.service';
+import { UpdateSoldierDto } from './dto/update-soldier.dto';
 
 @Injectable()
 export class SoldiersService {
@@ -13,6 +14,9 @@ export class SoldiersService {
     private readonly bussinessRulesService: BussinessRulesService,
   ) {}
 
+  async updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto) {
+    return this.repo.updateSoldier(soldierId, updateSoldierDto);
+  }
   async findSoldierById(soldierId: string) {
     try {
       return await this.repo.findSoldierById(soldierId);
@@ -61,17 +65,6 @@ export class SoldiersService {
     const soldierSkillLists = soldier.baseFigure?.[0]?.baseFigure?.skillLists?.map(skillList => skillList.skillListSlug) ?? [];
     await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists]);
     
-    if (skillSlug === 'corpo-treinado') {
-      await this.repo.addExtraSkillListToSoldier(soldierId, 'forca', `Corpo Treinado`  )
-    }
-
-    if(skillSlug === 'aprendizado-arcano') {
-      await this.repo.addExtraSpellLoreToSoldier(soldierId, 'magia-inferior', `Aprendizado Arcano`  )
-    }
-
-
-
-
     return this.repo.addSkillToSoldier(soldierId, skillSlug);
   }
   async removeSpellFromSoldier(warbandSoldierSpellId: string) {
@@ -152,6 +145,11 @@ export class SoldiersService {
       await this.bussinessRulesService.validateMainHand(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
     }
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
+    
+    const twoWeaponFighting = await this.bussinessRulesService.checkIfTwoWeaponFighting(soldier.equipment ?? [], soldier.skills ?? [], soldier.injuries ?? [], soldier.supernaturalAbilities ?? []);
+
+    await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
+    
   }
   async unequipItemFromSoldier(equipmentToWarbandSoldierId: string) {
     await this.repo.unequipGear(equipmentToWarbandSoldierId);
@@ -172,4 +170,5 @@ export class SoldiersService {
     await this.repo.findSoldierById(soldierId);
     await this.repo.unequipSlotFromSoldier(soldierId, slot);
   }
+  
 }
