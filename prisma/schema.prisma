@@ -234,6 +234,7 @@ model Modifier {
   category                   String                      @map("category")
   equipmentsInVault          EquipmentToVault[]
   equipmentToWarbandSoldiers EquipmentToWarbandSoldier[]
+  attributeModifiers         Json?                       @map("attribute_modifiers")
 
   @@map("modifiers")
 }
