@@ -493,4 +493,19 @@ export class BussinessRulesService {
       throw new BadRequestException('Figura não pode equipar mais de um elmo!');
     }
   }
+  checkIfTwoWeaponFightingBonus(equipment: EquipmentToWarbandSoldier[], skills: SkillToWarbandSoldier[], injuries: InjuryToWarbandSoldier[], superNaturalAbilities: SuperNaturalAbilityToWarbandSoldier[]): boolean {
+    const hasOffHandedBlocked = injuries.some(injury => injury.injury?.slug === `antebraco-esmagado`) || superNaturalAbilities.some(superNaturalAbility => superNaturalAbility.superNaturalAbility?.slug === `garra-colossal`);
+    const offHandEquipment = equipment.find(equipmentToWarbandSoldier => equipmentToWarbandSoldier.offHandEquiped === true);
+    const offHandIsShield = offHandEquipment?.equipment?.category === `Escudo`;
+    const hasArteDaMorteSilenciosa = skills.some(skill => skill.skill?.slug === `arte-da-morte-silenciosa`);
+    const isUnarmed = equipment.every(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === false && equipmentToWarbandSoldier.offHandEquiped === false && equipmentToWarbandSoldier.twoHandedEquiped === false);
+
+    if (hasOffHandedBlocked) return false;
+    
+    if (!offHandEquipment || offHandIsShield) return false;
+
+    if(isUnarmed && hasArteDaMorteSilenciosa) return true;
+    
+    return true;
+  }
 }

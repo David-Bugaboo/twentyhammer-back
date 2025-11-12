@@ -396,6 +396,8 @@ model SuperNaturalAbility {
   createdAt                           DateTime                              @default(now()) @map("created_at")
   superNaturalAbilityToWarbandSoldier SuperNaturalAbilityToWarbandSoldier[]
   attributeModifiers    Json?                   @map("attribute_modifiers")
+  extraNaturalAttack    Json?                   @map("natural_attack")
+
   @@map("super_natural_abilities")
 }
 
@@ -449,6 +451,7 @@ model Skill {
   skillToWarbandSoldier SkillToWarbandSoldier[]
   skillList             SkillList               @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
   attributeModifiers    Json?                   @map("attribute_modifiers")
+  extraNaturalAttack    Json?                   @map("natural_attack")
 
   @@map("skills")
 }
