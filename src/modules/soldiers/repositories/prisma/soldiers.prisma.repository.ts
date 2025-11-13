@@ -366,7 +366,7 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       where: { id: soldierId },
       data: {
         ...rest,
-        miscModifier:{
+        miscModifiers:{
           "fight": miscModifiers?.fight ?? 0,
           "shoot": miscModifiers?.shoot ?? 0,
           "armour": miscModifiers?.armour ?? 0,
