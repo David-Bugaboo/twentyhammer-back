@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Param, Delete, Body, Patch } from '@nestjs/common';
 import { SoldiersService } from './soldiers.service';
 import { UpdateSoldierDto } from './dto/update-soldier.dto';
+import { PromoteHeroDto } from './dto/promote-hero.dto';
 
 @Controller('soldiers')
 export class SoldiersController {
@@ -167,5 +168,19 @@ export class SoldiersController {
     @Param('spellToWarbandSoldierId') spellToWarbandSoldierId: string,
   ) {
     await this.soldiersService.unfortifySpell(spellToWarbandSoldierId);
+  }
+  @Post(':soldierId/promote/hero')
+  async promoteToHero(
+    @Param('soldierId') soldierId: string,
+    @Body() promoteHeroDto: PromoteHeroDto,
+  ) {
+    await this.soldiersService.promoteToHero(
+      soldierId,
+      promoteHeroDto.skillsListSlugs,
+    );
+  }
+  @Post(':soldierId/promote/leader')
+  async promoteLeader(@Param('soldierId') soldierId: string) {
+    await this.soldiersService.promoteLeader(soldierId);
   }
 }

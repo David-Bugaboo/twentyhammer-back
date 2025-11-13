@@ -405,4 +405,25 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       },
     });
   }
+  async promoteToHero (soldierId: string, skillsListSlugs:string[]): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        effectiveRole: `HEROI`,
+        extraSkillsLists: {
+          createMany: {
+            data: skillsListSlugs.map(skillListSlug => ({ skillListSlug: skillListSlug, source: `Promoção a héroi` })),
+          }
+        }
+      },
+    });
+  }
+  async promoteLeader(soldierId: string): Promise<void> {
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        effectiveRole: `LENDA`,
+      },
+    });
+  }
 }

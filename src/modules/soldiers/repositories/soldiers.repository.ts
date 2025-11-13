@@ -39,4 +39,6 @@ export abstract class SoldiersRepository {
   abstract updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
   abstract fortifySpell(spellToWarbandSoldierId: string): Promise<void>;
   abstract unfortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+  abstract promoteToHero(soldierId: string, skillsListSlugs: string[]): Promise<void>;
+  abstract promoteLeader(soldierId: string): Promise<void>;
 }
