@@ -366,8 +366,15 @@ export class WarbandPrismaRepository implements WarbandsRepository {
       });
 
       if (soldier.equipment.length > 0 && soldier.effectiveRole !== `MERCENARIO` && soldier.effectiveRole !== `LENDA` ) {
+        const dagger = soldier.equipment.find(equipment => equipment.equipmentSlug === `adaga`);
+        if (dagger) {
+          await tx.equipmentToWarbandSoldier.delete({
+            where: { id: dagger.id },
+          });
+        }   
+        const equipmentToReturn = soldier.equipment.filter(equipment => equipment.id !== dagger?.id);
         await tx.equipmentToVault.createMany({
-          data: soldier.equipment.map((equipment) => ({
+          data: equipmentToReturn.map((equipment) => ({
             warbandId,
             equipmentSlug: equipment.equipmentSlug,
             modifierSlug: equipment.modifierSlug ?? undefined,
