@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/services/prisma.service';
 import { SoldiersRepository } from '../soldiers.repository';
 import { Injectable } from '@nestjs/common';
@@ -358,9 +359,13 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     });
   }
   async updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void> {
+    const { miscModifiers, ...rest } = updateSoldierDto;
     await this.prisma.warbandSoldier.update({
       where: { id: soldierId },
-      data: updateSoldierDto,
+      data: {
+        ...rest,
+        
+      },
     });
   }
 }
