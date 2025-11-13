@@ -55,7 +55,9 @@ export class SoldiersService {
     const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
     const soldierSpells = soldier.spells?.map(spell => spell.spellSlug) ?? [];
     const soldierSpellLores = soldier.baseFigure?.[0]?.baseFigure?.spellLores?.map(spellLore => spellLore.spellLoreSlug) ?? [];
-    await this.bussinessRulesService.validateSpell(spellSlug, soldierSpellLores, soldierSpells, soldierSkills);
+    const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];                                       
+    await this.bussinessRulesService.validateSpell(spellSlug, soldierSpellLores, soldierSpells, soldierSkills, soldierAdvancements);
+
     return this.repo.addSpellToSoldier(soldierId, spellSlug);
   }
   async addSkillToSoldier(soldierId: string, skillSlug: string) {
@@ -63,7 +65,9 @@ export class SoldiersService {
     const soldierExtraSkillLists = soldier.extraSkillLists?.map(skillList => skillList.skillListSlug) ?? [];
     const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
     const soldierSkillLists = soldier.baseFigure?.[0]?.baseFigure?.skillLists?.map(skillList => skillList.skillListSlug) ?? [];
-    await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists]);
+    const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
+
+    await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists], soldierAdvancements);
     
     return this.repo.addSkillToSoldier(soldierId, skillSlug);
   }
@@ -190,6 +194,16 @@ export class SoldiersService {
   }
   async unfortifySpell(spellToWarbandSoldierId: string) {
     const spell = await this.queriesService.findSpellToWarbandSoldierById(spellToWarbandSoldierId);
+    const soldier = await this.repo.findSoldierById(spell.warbandSoldierId);
+    const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
+    const soldierSpells = soldier.spells
+    const howManySpellFortifies = soldierSpells?.reduce((acc, spell) => acc + spell.modifier, 0) ?? 0
+    const howManyFortifyAdvancements = soldierAdvancements.filter(advancement => advancement === `fortalecer-magia`).length;
+    
+    if(howManySpellFortifies! >= howManyFortifyAdvancements) {
+      throw new BadRequestException('sem avanços de fortificação de magia suficientes para desfortificar uma magia!');
+    }
+
     if (spell.modifier === 0) {
       throw new BadRequestException('Feitiço não fortificado.');
     }
