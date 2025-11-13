@@ -42,6 +42,8 @@ model Faction {
   createdAt DateTime     @default(now()) @map("created_at")
   figures   BaseFigure[]
   warbands  Warband[]
+  jsonData  Json?        @map("json_data")
+  
 
   @@map("factions")
 }
@@ -85,6 +87,7 @@ model BaseFigure {
   legendStartingSkills        LegendStartingSkills[]
   legendStartingSpells        LegendStartingSpells[]
   mercenaryStartingEquipment  MercenaryStartingEquipment[]
+
 
   @@map("base_figures")
 }

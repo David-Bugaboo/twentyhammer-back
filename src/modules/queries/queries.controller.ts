@@ -120,4 +120,6 @@ export class QueriesController {
   findBaseFigureByslug(@Param('slug') slug: string) {
     return this.queriesService.findBaseFigureByslug(slug);
   }
+
+  
 }

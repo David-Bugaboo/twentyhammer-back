@@ -190,6 +190,12 @@ export class SoldiersService {
     await this.repo.updateSoldier(soldierId, { twoWeaponFighting });
   }
   async fortifySpell(spellToWarbandSoldierId: string) {
+    const spell = await this.queriesService.findSpellToWarbandSoldierById(spellToWarbandSoldierId);
+
+    if (spell.spell?.difficultyClass! - spell.modifier <= 6) {
+      throw new BadRequestException('Feitiço chegou ao limite de forticação.');
+    }
+    
     return this.repo.fortifySpell(spellToWarbandSoldierId);
   }
   async unfortifySpell(spellToWarbandSoldierId: string) {
@@ -209,5 +215,31 @@ export class SoldiersService {
     }
     return this.repo.unfortifySpell(spellToWarbandSoldierId);
   }
+  async promoteToHero(soldierId: string, skillsListSlugs: string[]) {
+    const soldier = await this.repo.findSoldierById(soldierId);
+    const warband = await this.warbandRepo.resolveWarband(soldier.warbandId);
+    const factionFigures = await this.queriesService.findAllBaseFigures({ factionSlug: warband.factionSlug });
+    const factionSkillLists = factionFigures.flatMap(figure => figure.skillLists?.map(skillList => skillList.skillListSlug));
+    if (skillsListSlugs.every(skillList => factionSkillLists.includes(skillList))) {
+      await this.repo.promoteToHero(soldierId, skillsListSlugs);
+    } else {
+      throw new BadRequestException('Listas de habilidades inválida.');
+    }
+  }
+  async promoteLeader(soldierId: string) {
+    const soldier = await this.repo.findSoldierById(soldierId);
+    const warband = await this.warbandRepo.resolveWarband(soldier.warbandId);
+
+    const leader = warband.warbandSoldiers?.find(warbandSoldier => warbandSoldier.effectiveRole === `LENDA`);
+
+    if (leader) {
+      throw new BadRequestException('Já existe um líder no bando.');
+    }
+
+    await this.repo.promoteLeader(soldierId);
+
+    
+  }
+
   
 }
