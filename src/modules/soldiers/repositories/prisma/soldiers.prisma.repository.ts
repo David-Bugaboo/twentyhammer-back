@@ -293,6 +293,8 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
         mainHandEquiped: false,
         offHandEquiped: false,
         twoHandedEquiped: false,
+        armorEquiped:false,
+        helmetEquiped:false
       },
     });
   }
