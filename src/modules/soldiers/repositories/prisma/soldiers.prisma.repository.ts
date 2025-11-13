@@ -306,6 +306,8 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
         mainHandEquiped: false,
         offHandEquiped: false,
         twoHandedEquiped: false,
+        armorEquiped:false,
+        helmetEquiped:false
       },
     });
   }
@@ -364,7 +366,14 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       where: { id: soldierId },
       data: {
         ...rest,
-        
+        miscModifier:{
+          "fight": miscModifiers?.fight ?? 0,
+          "shoot": miscModifiers?.shoot ?? 0,
+          "armour": miscModifiers?.armour ?? 0,
+          "will": miscModifiers?.will ?? 0,
+          "health": miscModifiers?.health ?? 0,
+          "strength": miscModifiers?.strength ?? 0,
+        }
       },
     });
   }
