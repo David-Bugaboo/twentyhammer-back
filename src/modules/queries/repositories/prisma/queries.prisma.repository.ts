@@ -26,6 +26,7 @@ import { QueriesRepository } from '../queries.repository';
 import { EquipmentToWarbandSoldier } from 'src/modules/soldiers/entities/equipment-to-warband-soldier.entity';
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
 import { SkillToWarbandSoldier } from 'src/modules/soldiers/entities/skill-to-warband-soldier.entity';
+import { SpellToWarbandSoldier } from 'src/modules/soldiers/entities/spell-to-warband-soldier.entity';
 
 @Injectable()
 export class QueriesPrismaRepository implements QueriesRepository {
@@ -372,6 +373,12 @@ export class QueriesPrismaRepository implements QueriesRepository {
     return this.prisma.skillToWarbandSoldier.findUniqueOrThrow({
       where: { id },
       include: { skill: true, warbandSoldier: true },
+    });
+  }
+  async findSpellToWarbandSoldierById(id: string): Promise<SpellToWarbandSoldier> {
+    return this.prisma.spellToWarbandSoldier.findUniqueOrThrow({
+      where: { id },
+      include: { spell: true, warbandSoldier: true },
     });
   }
 }

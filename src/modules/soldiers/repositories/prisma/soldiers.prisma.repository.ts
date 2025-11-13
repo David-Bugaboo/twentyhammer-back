@@ -377,4 +377,24 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       },
     });
   }
+  async fortifySpell(spellToWarbandSoldierId: string): Promise<void> {
+    await this.prisma.spellToWarbandSoldier.update({
+      where: { id: spellToWarbandSoldierId },
+      data: {
+        modifier: {
+          increment: 1,
+        },
+      },
+    });
+  }
+  async unfortifySpell(spellToWarbandSoldierId: string): Promise<void> {
+    await this.prisma.spellToWarbandSoldier.update({
+      where: { id: spellToWarbandSoldierId },
+      data: {
+        modifier: {
+          decrement: 1,
+        },
+      },
+    });
+  }
 }

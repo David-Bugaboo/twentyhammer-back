@@ -284,6 +284,7 @@ model SpellToWarbandSoldier {
   warbandSoldierId String         @map("warband_soldier_id")
   createdAt        DateTime       @default(now()) @map("created_at")
   spell            Spell          @relation(fields: [spellSlug], references: [slug], onDelete: Cascade)
+  modifier         Int            @default(0)
   warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
 
   @@map("spell_to_warband_soldier")

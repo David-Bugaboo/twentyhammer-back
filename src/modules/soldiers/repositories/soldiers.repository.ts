@@ -37,4 +37,6 @@ export abstract class SoldiersRepository {
   abstract addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void>;
   abstract removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void>;
   abstract updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
+  abstract fortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+  abstract unfortifySpell(spellToWarbandSoldierId: string): Promise<void>;
 }

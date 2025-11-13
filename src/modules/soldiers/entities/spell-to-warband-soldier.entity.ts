@@ -8,6 +8,7 @@ export class SpellToWarbandSoldier {
   createdAt!: Date;
   @Type(() => Spell)
   spell?: Spell;
+  modifier: number;
 }
 
 

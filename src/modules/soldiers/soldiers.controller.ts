@@ -155,4 +155,17 @@ export class SoldiersController {
   ) {
     await this.soldiersService.updateSoldier(soldierId, updateSoldierDto);
   }
+
+  @Post(':soldierId/spells/:spellToWarbandSoldierId/fortify')
+  async fortifySpell(
+    @Param('spellToWarbandSoldierId') spellToWarbandSoldierId: string,
+  ) {
+    await this.soldiersService.fortifySpell(spellToWarbandSoldierId);
+  }
+  @Post(':soldierId/spells/:spellToWarbandSoldierId/unfortify')
+  async unfortifySpell(
+    @Param('spellToWarbandSoldierId') spellToWarbandSoldierId: string,
+  ) {
+    await this.soldiersService.unfortifySpell(spellToWarbandSoldierId);
+  }
 }

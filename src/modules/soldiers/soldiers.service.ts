@@ -161,7 +161,6 @@ export class SoldiersService {
     await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
 
   }
-
   async defineIfTwoWeaponFighting(soldierId: string) {
     const soldier = await this.repo.findSoldierById(soldierId);
     const soldierEquipment = soldier.equipment ?? []
@@ -185,6 +184,16 @@ export class SoldiersService {
     await this.repo.unequipSlotFromSoldier(soldierId, slot);
     const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldierId);
     await this.repo.updateSoldier(soldierId, { twoWeaponFighting });
+  }
+  async fortifySpell(spellToWarbandSoldierId: string) {
+    return this.repo.fortifySpell(spellToWarbandSoldierId);
+  }
+  async unfortifySpell(spellToWarbandSoldierId: string) {
+    const spell = await this.queriesService.findSpellToWarbandSoldierById(spellToWarbandSoldierId);
+    if (spell.modifier === 0) {
+      throw new BadRequestException('Feitiço não fortificado.');
+    }
+    return this.repo.unfortifySpell(spellToWarbandSoldierId);
   }
   
 }

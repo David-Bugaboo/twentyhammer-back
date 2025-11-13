@@ -116,4 +116,11 @@ export class QueriesService {
   findSkillToWarbandSoldierById(id: string) {
     return this.repo.findSkillToWarbandSoldierById(id);
   }
+  async findSpellToWarbandSoldierById(id: string) {
+    try {
+      return await this.repo.findSpellToWarbandSoldierById(id);
+    } catch (error) {
+      throw new NotFoundException('Feitiço não encontrado no inventário.');
+    }
+  }
 }
