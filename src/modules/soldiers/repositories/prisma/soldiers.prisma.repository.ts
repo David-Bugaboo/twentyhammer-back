@@ -235,6 +235,7 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
           },
           equipment: {
             select: {
+              id: true,
               equipmentSlug: true,
               modifierSlug: true,
             },
@@ -252,7 +253,14 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       });
 
       if (soldier.effectiveRole !== `MERCENARIO` && soldier.effectiveRole !== `LENDA`) {
-        for (const equipment of soldier.equipment) {
+        const dagger = soldier.equipment.find(equipment => equipment.equipmentSlug === `adaga`);
+        if (dagger) {
+          await tx.equipmentToWarbandSoldier.delete({
+            where: { id: dagger.id },
+          });
+        }
+        const equipmentToReturn = soldier.equipment.filter(equipment => equipment.id !== dagger?.id);
+        for (const equipment of equipmentToReturn) {
           await tx.equipmentToVault.create({
             data: {
               warbandId: soldier.warbandId,
