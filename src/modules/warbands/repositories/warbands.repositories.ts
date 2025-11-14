@@ -11,7 +11,6 @@ export abstract class WarbandsRepository {
     data: CreateWarbandDto,
     userId: string,
     factionSlug: string,
-    leader: BaseFigure,
   ): Promise<Warband>;
   abstract findWarbandById(id: string): Promise<Warband>;
   abstract findAllWarbands(query: QueryDto): Promise<{

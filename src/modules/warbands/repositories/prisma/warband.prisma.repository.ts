@@ -156,40 +156,15 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     data: CreateWarbandDto,
     userId: string,
     factionSlug: string,
-    leader: BaseFigure,
+
   ): Promise<Warband> {
-    const isDaggerCompatible = leader.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`)
+   
     const warband = await this.prisma.warband.create({
       data: {
         ...data,
         userId,
         factionSlug,
-        warbandSoldiers: {
-          create: isDaggerCompatible ? {
-            effectiveRole: leader.role as Role,
-            experience: leader.startingXp ?? 0,
-            baseFigure: {
-              create: {
-                baseFigureSlug: leader.slug,
-              },
-            },
-            equipment: {
-              create: {
-                compatible: true,
-                equipmentSlug: `adaga`
-              }
-            }
-            
-          }:{
-            effectiveRole: leader.role as Role,
-            experience: leader.startingXp ?? 0,
-            baseFigure: {
-              create: {
-                baseFigureSlug: leader.slug,
-              },
-            },  
-          },
-        },
+       
       },
       include: this.defaultWarbandInclude,
     });

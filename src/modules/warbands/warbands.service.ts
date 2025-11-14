@@ -29,10 +29,9 @@ export class WarbandsService {
     userId: string,
     factionSlug: string,
   ) {
-    const leader: BaseFigure =
-      await this.bussinessRulesService.getLeader(factionSlug);
+    
     await this.bussinessRulesService.validateFaction(factionSlug);
-    return this.repo.create(createWarbandDto, userId, factionSlug, leader);
+    return this.repo.create(createWarbandDto, userId, factionSlug);
   }
 
   findAll(query: QueryDto) {
