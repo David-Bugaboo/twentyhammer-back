@@ -247,6 +247,7 @@ model WarbandSoldier {
   campaignName           String?                               @map("campaign_name")
   notes                  String?
   effectiveRole          Role                                  @default(HEROI) @map("effective_role")
+  active                 Boolean                               @default(true)  @map("active")
   warbandId              String                                @map("warband_id")
   twoWeaponFighting      Boolean                               @default(false) @map("two_weapon_fighting")
   experience             Int                                   @default(0) @map("experience")

@@ -18,6 +18,7 @@ export class WarbandSoldier {
   campaignName?: string | null;
   warbandId!: string;
   experience!: number;
+  active!: boolean;
   effectiveRole?: Role | null;
   createdAt!: Date;
   extraSpecialRules?: unknown;
