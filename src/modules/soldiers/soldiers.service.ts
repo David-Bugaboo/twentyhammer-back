@@ -240,6 +240,9 @@ export class SoldiersService {
 
     
   }
+  async toggleSoldierActive(soldierId: string) {
+    return this.repo.toggleSoldierActive(soldierId);
+  }
 
   
 }

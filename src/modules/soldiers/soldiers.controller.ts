@@ -183,4 +183,8 @@ export class SoldiersController {
   async promoteLeader(@Param('soldierId') soldierId: string) {
     await this.soldiersService.promoteLeader(soldierId);
   }
+  @Post(':soldierId/toggle')
+  async toggleSoldierActive(@Param('soldierId') soldierId: string) {
+    await this.soldiersService.toggleSoldierActive(soldierId);
+  }
 }
