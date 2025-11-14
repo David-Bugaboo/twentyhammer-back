@@ -302,6 +302,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
                   compatible: true,
                   equipmentSlug: equipment.equipmentSlug,
                  })) ?? [],
+                 
                 ]},
               },
               spells: {
