@@ -231,6 +231,14 @@ export class WarbandPrismaRepository implements WarbandsRepository {
       compatible: true,
       equipmentSlug: `adaga`
     }] : []
+    startingEquipment.push(...soldier.mercenaryStartingEquipment?.map(equipment => ({
+                    compatible: true,
+                    equipmentSlug: equipment.equipmentSlug,
+    }))!)
+    startingEquipment.push(...soldier.legendStartingEquipment?.map(equipment => ({
+                    compatible: true,
+                    equipmentSlug: equipment.equipmentSlug,
+    }))!)
     const updated = await this.prisma.$transaction(async (tx) => {
       const warband = await tx.warband.findUniqueOrThrow({
         where: {
