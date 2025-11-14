@@ -10,6 +10,7 @@ import { Equipment } from 'src/entities/equipment.entity';
 import { Modifier } from 'src/entities/modifier.entity';
 import { Role } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
+import { SharedLink } from '../../entities/sharedLink.entity';
 
 @Injectable()
 export class WarbandPrismaRepository implements WarbandsRepository {
@@ -37,6 +38,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         },
       },
     },
+    sharedLinks: true,
   };
   private readonly fullWarbandInclude = {
     faction: true,
@@ -47,6 +49,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         modifier: true,
       },
     },
+    sharedLinks: true,
     warbandSoldiers: {
       include: {
         advancements: {
@@ -502,5 +505,26 @@ export class WarbandPrismaRepository implements WarbandsRepository {
 
     return plainToInstance(BaseFigure, figures);
   }
-  
+  async createSharedLink(warbandId: string, bandSnapShot: any): Promise<SharedLink> {
+    const sharedLink = await this.prisma.sharedLink.create({
+      data: {
+        warbandId,
+        bandSnapShot
+      },
+    });
+    return plainToInstance(SharedLink, sharedLink);
+  }
+  async updateSharedLink(id: string, bandSnapShot: any): Promise<SharedLink> {
+    const sharedLink = await this.prisma.sharedLink.update({
+      where: { id },
+      data: { bandSnapShot },
+    });
+    return plainToInstance(SharedLink, sharedLink);
+  }
+  async findSharedLinkById(id: string): Promise<SharedLink> {
+    const sharedLink = await this.prisma.sharedLink.findUniqueOrThrow({
+      where: { id },
+    });
+    return plainToInstance(SharedLink, sharedLink);
+  }
 }

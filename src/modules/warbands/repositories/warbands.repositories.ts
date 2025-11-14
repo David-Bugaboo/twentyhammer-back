@@ -5,6 +5,7 @@ import { UpdateWarbandDto } from '../dto/update-warband.dto';
 import { BaseFigure } from 'src/entities/base-figure.entity';
 import { Equipment } from 'src/entities/equipment.entity';
 import { Modifier } from 'src/entities/modifier.entity';
+import { SharedLink } from '../entities/sharedLink.entity';
 
 export abstract class WarbandsRepository {
   abstract create(
@@ -44,5 +45,8 @@ export abstract class WarbandsRepository {
     equipmentToVaultId: string,
     sell: boolean,
   ): Promise<Warband>;
-  abstract findWarbandAvaiableHirings(factionName:string): Promise<BaseFigure[]>;
+  abstract findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]>;
+  abstract createSharedLink(warbandId: string, bandSnapShot: any): Promise<SharedLink>;
+  abstract updateSharedLink(id: string, bandSnapShot: any): Promise<SharedLink>;
+  abstract findSharedLinkById(id: string): Promise<SharedLink>;
 }

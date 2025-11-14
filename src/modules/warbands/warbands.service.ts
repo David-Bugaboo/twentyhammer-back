@@ -146,4 +146,15 @@ export class WarbandsService {
   async findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]> {
     return this.repo.findWarbandAvaiableHirings(factionName);
   }
+  async createSharedLink(warbandId: string) {
+    const warband = await this.resolveWarband(warbandId);
+    const bandSnapShot = await this.repo.createSharedLink(warbandId, warband);
+    return this.repo.createSharedLink(warbandId, bandSnapShot);
+  }
+  async updateSharedLink(id: string, bandSnapShot: any) {
+    return this.repo.updateSharedLink(id, bandSnapShot);
+  }
+  async findSharedLinkById(id: string) {
+    return this.repo.findSharedLinkById(id);
+  }
 }

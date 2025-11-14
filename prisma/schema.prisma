@@ -31,6 +31,7 @@ model Warband {
   warbandSoldiers WarbandSoldier[]
   faction         Faction            @relation(fields: [factionSlug], references: [slug], onDelete: Cascade)
   user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedLinks     SharedLink[]
 
   @@map("warbands")
 }
@@ -46,6 +47,17 @@ model Faction {
   
 
   @@map("factions")
+}
+
+model SharedLink {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @map("id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  warbandId String    @map("warband_id")
+  warband   Warband   @relation(fields: [warbandId], references: [id], onDelete: Cascade)
+  bandSnapShot Json    @map("band_snap_shot")
+
+  @@map("shared_links")
 }
 
 model BaseFigure {
