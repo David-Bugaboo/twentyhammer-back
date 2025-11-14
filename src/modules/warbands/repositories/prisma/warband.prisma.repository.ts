@@ -275,17 +275,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
               equipment: {
                 createMany: {
                   data: [
-                  ...startingEquipment,
-                 
-                 ...soldier.mercenaryStartingEquipment?.map(equipment => ({
-                    compatible: true,
-                    equipmentSlug: equipment.equipmentSlug,
-                 })) ?? [],
-                 ...soldier.legendStartingEquipment?.map(equipment => ({
-                  compatible: true,
-                  equipmentSlug: equipment.equipmentSlug,
-                 })) ?? [],
-                 
+                  ...startingEquipment
                 ]},
               },
               spells: {
