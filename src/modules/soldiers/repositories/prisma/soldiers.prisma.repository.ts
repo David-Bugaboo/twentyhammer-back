@@ -422,7 +422,7 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     await this.prisma.warbandSoldier.update({
       where: { id: soldierId },
       data: {
-        effectiveRole: `LENDA`,
+        effectiveRole: `LIDER`,
       },
     });
   }
