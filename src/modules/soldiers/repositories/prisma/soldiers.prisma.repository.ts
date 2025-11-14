@@ -422,7 +422,21 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     await this.prisma.warbandSoldier.update({
       where: { id: soldierId },
       data: {
-        effectiveRole: `LENDA`,
+        effectiveRole: `LIDER`,
+      },
+    });
+  }
+  async toggleSoldierActive(soldierId: string): Promise<void> {
+    const soldier = await this.prisma.warbandSoldier.findUniqueOrThrow({
+      where: { id: soldierId },
+      select: {
+        active: true,
+      },
+    });
+    await this.prisma.warbandSoldier.update({
+      where: { id: soldierId },
+      data: {
+        active: { set: !soldier.active },
       },
     });
   }
