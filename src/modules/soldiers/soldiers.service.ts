@@ -84,14 +84,7 @@ export class SoldiersService {
   async removeSkillFromSoldier(warbandToSoldierItemId: string) {
     const skill = await this.queriesService.findSkillToWarbandSoldierById(warbandToSoldierItemId);
 
-    if(skill.skillSlug === 'corpo-treinado') {
-      await this.repo.removeExtraSkillListFromSoldier(skill.warbandSoldierId, 'forca');
-    }
-
-    if(skill.skillSlug === 'aprendizado-arcano') {
-      await this.repo.removeExtraSpellLoreFromSoldier(skill.warbandSoldierId, 'magia-inferior');
-    }
-
+   
     return this.repo.removeSkillFromSoldier(warbandToSoldierItemId);
 
   }

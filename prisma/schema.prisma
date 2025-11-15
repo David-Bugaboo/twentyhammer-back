@@ -185,7 +185,7 @@ model Equipment {
   movementPenalty             Int?                         @map("movement_penalty")
   rarity                      Int                          @default(1) @map("rarity")
   slot                        Int?                         @map("slot")
-  attribute_modifiers         Json?                        @default("{\"will\": 0, \"fight\": 0, \"shoot\": 0, \"armour\": 0, \"health\": 0, \"movement\": 0, \"strength\": 0}")
+  attributeModifiers         Json?                         @map("attribute_modifiers") @default("{\"will\": 0, \"fight\": 0, \"shoot\": 0, \"armour\": 0, \"health\": 0, \"movement\": 0, \"strength\": 0}") 
   equipmentToVault            EquipmentToVault[]
   equipmentToWarbandSoldier   EquipmentToWarbandSoldier[]
   figureToAvaiableEquipments  FigureToAvaiableEquipment[]
