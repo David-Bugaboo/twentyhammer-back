@@ -515,9 +515,9 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     return plainToInstance(SharedLink, sharedLink);
   }
   async updateSharedLink(id: string, bandSnapShot: any): Promise<SharedLink> {
-    const sharedLink = await this.prisma.sharedLink.update({
-      where: { id },
-      data: { bandSnapShot },
+    const sharedLink = await this.prisma.sharedLink.updateMany({
+      where: { warbandId: id },
+      data:  bandSnapShot ,
     });
     return plainToInstance(SharedLink, sharedLink);
   }

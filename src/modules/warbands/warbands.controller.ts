@@ -113,8 +113,8 @@ export class WarbandsController {
     return this.warbandsService.createSharedLink(id);
   }
   @Patch(':id/share')
-  updateSharedLink(@Param('id') id: string, @Body() bandSnapShot: any) {
-    return this.warbandsService.updateSharedLink(id, bandSnapShot);
+  updateSharedLink(@Param('id') id: string) {
+    return this.warbandsService.updateSharedLink(id);
   }
   @Get('shared-link/:id')
   findSharedLinkById(@Param('id') id: string) {

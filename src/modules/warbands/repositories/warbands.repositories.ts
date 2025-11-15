@@ -46,7 +46,7 @@ export abstract class WarbandsRepository {
     sell: boolean,
   ): Promise<Warband>;
   abstract findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]>;
-  abstract createSharedLink(warbandId: string, bandSnapShot: any): Promise<SharedLink>;
+  abstract createSharedLink(warbandId: string, bandSnapShot:any): Promise<SharedLink>;
   abstract updateSharedLink(id: string, bandSnapShot: any): Promise<SharedLink>;
   abstract findSharedLinkById(id: string): Promise<SharedLink>;
 }

@@ -148,11 +148,11 @@ export class WarbandsService {
   }
   async createSharedLink(warbandId: string) {
     const warband = await this.resolveWarband(warbandId);
-    const bandSnapShot = await this.repo.createSharedLink(warbandId, warband);
-    return this.repo.createSharedLink(warbandId, bandSnapShot);
+    return this.repo.createSharedLink(warbandId, warband);
   }
-  async updateSharedLink(id: string, bandSnapShot: any) {
-    return this.repo.updateSharedLink(id, bandSnapShot);
+  async updateSharedLink(id: string) {
+    const warband = await this.resolveWarband(id);
+    return this.repo.updateSharedLink(id, warband);
   }
   async findSharedLinkById(id: string) {
     return this.repo.findSharedLinkById(id);
