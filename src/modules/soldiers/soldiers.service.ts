@@ -133,6 +133,8 @@ export class SoldiersService {
     const soldierInjuries = soldier.injuries?.map(injury => injury.injurySlug)
     const soldierArmor = soldier.equipment?.find(equipment => equipment.armorEquiped === true); 
     const soldierHelmet = soldier.equipment?.find(equipment => equipment.helmetEquiped === true); 
+    const equipmentSpecialRules = this.bussinessRulesService.normalizeSpecialRules(warbandSoldierEquipment?.equipment?.specialRules);
+
     
     
     if (slot === `armorEquiped` && soldierArmor) { 
@@ -149,6 +151,10 @@ export class SoldiersService {
     }
     if (slot === `mainHandEquiped`) {
       await this.bussinessRulesService.validateMainHand(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
+    }
+
+    if(equipmentSpecialRules.some(rule => rule.label === `Par`) && slot === `offHandEquiped`) {
+      slot = `Par`
     }
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
     
