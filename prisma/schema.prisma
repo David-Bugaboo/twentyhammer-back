@@ -88,6 +88,8 @@ model BaseFigure {
   canGetMutations             Boolean                      @default(false) @map("can_get_mutations")
   canGetSacredMarks           Boolean                      @default(false) @map("can_get_sacred_marks")
   noXp                        Boolean                      @default(false) @map("no_xp")
+  min                      Int?                         @map("min")
+  max                      Int?                         @map("max")
   naturalAttacks              Json?                        @map("natural_attacks")
   baseFigureToWarbandSoldiers BaseFigureToWarbandSoldier[]
   faction                     Faction?                     @relation(fields: [factionSlug], references: [slug], onDelete: Cascade)
