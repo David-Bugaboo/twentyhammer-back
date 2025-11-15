@@ -13,7 +13,9 @@ exports.WarbandPrismaRepository = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../../../../prisma/services/prisma.service");
 const warband_entity_1 = require("../../entities/warband.entity");
+const base_figure_entity_1 = require("../../../../entities/base-figure.entity");
 const class_transformer_1 = require("class-transformer");
+const sharedLink_entity_1 = require("../../entities/sharedLink.entity");
 let WarbandPrismaRepository = class WarbandPrismaRepository {
     prisma;
     defaultWarbandInclude = {
@@ -40,6 +42,7 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                 },
             },
         },
+        sharedLinks: true,
     };
     fullWarbandInclude = {
         faction: true,
@@ -50,6 +53,7 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                 modifier: true,
             },
         },
+        sharedLinks: true,
         warbandSoldiers: {
             include: {
                 advancements: {
@@ -140,44 +144,28 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                         skillList: true,
                     },
                 },
+                extraSkillsLists: {
+                    include: {
+                        skillList: true,
+                    },
+                },
+                extraSpellsLores: {
+                    include: {
+                        spellLore: true,
+                    }
+                },
             },
         },
     };
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async create(data, userId, factionSlug, leader) {
-        const isDaggerCompatible = leader.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`);
+    async create(data, userId, factionSlug) {
         const warband = await this.prisma.warband.create({
             data: {
                 ...data,
                 userId,
                 factionSlug,
-                warbandSoldiers: {
-                    create: isDaggerCompatible ? {
-                        effectiveRole: leader.role,
-                        experience: leader.startingXp ?? 0,
-                        baseFigure: {
-                            create: {
-                                baseFigureSlug: leader.slug,
-                            },
-                        },
-                        equipment: {
-                            create: {
-                                compatible: true,
-                                equipmentSlug: `adaga`
-                            }
-                        }
-                    } : {
-                        effectiveRole: leader.role,
-                        experience: leader.startingXp ?? 0,
-                        baseFigure: {
-                            create: {
-                                baseFigureSlug: leader.slug,
-                            },
-                        },
-                    },
-                },
             },
             include: this.defaultWarbandInclude,
         });
@@ -228,6 +216,18 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
     }
     async addSoldierToWarband(warbandId, soldier) {
         const isDaggerCompatible = soldier.avaiableEquipment?.find(equipment => equipment.avaiableEquipmentSlug === `adaga`);
+        const startingEquipment = isDaggerCompatible ? [{
+                compatible: true,
+                equipmentSlug: `adaga`
+            }] : [];
+        startingEquipment.push(...soldier.mercenaryStartingEquipment?.map(equipment => ({
+            compatible: true,
+            equipmentSlug: equipment.equipmentSlug,
+        })));
+        startingEquipment.push(...soldier.legendStartingEquipment?.map(equipment => ({
+            compatible: true,
+            equipmentSlug: equipment.equipmentSlug,
+        })));
         const updated = await this.prisma.$transaction(async (tx) => {
             const warband = await tx.warband.findUniqueOrThrow({
                 where: {
@@ -241,38 +241,51 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                 where: {
                     id: warbandId,
                 },
-                data: isDaggerCompatible ? {
+                data: {
                     warbandSoldiers: {
                         create: {
                             effectiveRole: soldier.role,
                             experience: soldier.startingXp ?? 0,
+                            miscModifiers: {
+                                "move": 0,
+                                "will": 0,
+                                "fight": 0,
+                                "shoot": 0,
+                                "armour": 0,
+                                "health": 0,
+                                "strength": 0
+                            },
                             baseFigure: {
                                 create: {
                                     baseFigureSlug: soldier.slug,
                                 },
                             },
                             equipment: {
-                                create: {
-                                    compatible: true,
-                                    equipmentSlug: `adaga`
+                                createMany: {
+                                    data: [
+                                        ...startingEquipment
+                                    ]
+                                },
+                            },
+                            spells: {
+                                createMany: {
+                                    data: soldier.legendStartingSpells?.map(spell => ({
+                                        spellSlug: spell.spellSlug,
+                                    })) ?? [],
+                                },
+                            },
+                            skills: {
+                                createMany: {
+                                    data: soldier.legendStartingSkills?.map(skill => ({
+                                        skillSlug: skill.skillSlug,
+                                    })) ?? [],
                                 },
                             },
                         },
                     },
-                    crowns: warband.crowns - soldier.cost,
-                } : {
-                    warbandSoldiers: {
-                        create: {
-                            effectiveRole: soldier.role,
-                            experience: soldier.startingXp ?? 0,
-                            baseFigure: {
-                                create: {
-                                    baseFigureSlug: soldier.slug,
-                                },
-                            },
-                        },
-                    },
-                    crowns: warband.crowns - soldier.cost,
+                    crowns: {
+                        decrement: soldier.cost,
+                    }
                 },
                 include: this.defaultWarbandInclude,
             });
@@ -306,9 +319,16 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
                     equipment: true,
                 },
             });
-            if (soldier.equipment.length > 0) {
+            if (soldier.equipment.length > 0 && soldier.effectiveRole !== `MERCENARIO` && soldier.effectiveRole !== `LENDA`) {
+                const dagger = soldier.equipment.find(equipment => equipment.equipmentSlug === `adaga`);
+                if (dagger) {
+                    await tx.equipmentToWarbandSoldier.delete({
+                        where: { id: dagger.id },
+                    });
+                }
+                const equipmentToReturn = soldier.equipment.filter(equipment => equipment.id !== dagger?.id);
                 await tx.equipmentToVault.createMany({
-                    data: soldier.equipment.map((equipment) => ({
+                    data: equipmentToReturn.map((equipment) => ({
                         warbandId,
                         equipmentSlug: equipment.equipmentSlug,
                         modifierSlug: equipment.modifierSlug ?? undefined,
@@ -385,6 +405,90 @@ let WarbandPrismaRepository = class WarbandPrismaRepository {
             });
         });
         return (0, class_transformer_1.plainToInstance)(warband_entity_1.Warband, updated);
+    }
+    async findWarbandAvaiableHirings(factionName) {
+        const figures = await this.prisma.baseFigure.findMany({
+            where: {
+                role: {
+                    in: [`MERCENARIO`, `LENDA`],
+                },
+                OR: [
+                    {
+                        avaiability: {
+                            has: factionName,
+                        },
+                    },
+                    {
+                        avaiability: {
+                            has: `Todos`,
+                        },
+                    },
+                ],
+                NOT: {
+                    exclusions: {
+                        has: factionName,
+                    },
+                },
+            },
+            include: {
+                avaiableEquipment: {
+                    include: {
+                        avaiableEquipment: true,
+                    },
+                },
+                skillLists: {
+                    include: {
+                        skillList: true,
+                    },
+                },
+                spellLores: {
+                    include: {
+                        spellLore: true,
+                    },
+                },
+                legendStartingEquipment: true,
+                legendStartingSkills: {
+                    include: {
+                        skill: true,
+                    },
+                },
+                legendStartingSpells: {
+                    include: {
+                        spell: true,
+                    },
+                },
+                mercenaryStartingEquipment: {
+                    include: {
+                        equipment: true,
+                    },
+                },
+            },
+        });
+        return (0, class_transformer_1.plainToInstance)(base_figure_entity_1.BaseFigure, figures);
+    }
+    async createSharedLink(warbandId, bandSnapShot) {
+        const sharedLink = await this.prisma.sharedLink.create({
+            data: {
+                warbandId,
+                bandSnapShot
+            },
+        });
+        return (0, class_transformer_1.plainToInstance)(sharedLink_entity_1.SharedLink, sharedLink);
+    }
+    async updateSharedLink(id, bandSnapShot) {
+        const sharedLink = await this.prisma.sharedLink.updateMany({
+            where: { warbandId: id },
+            data: {
+                bandSnapShot
+            },
+        });
+        return (0, class_transformer_1.plainToInstance)(sharedLink_entity_1.SharedLink, sharedLink);
+    }
+    async findSharedLinkById(id) {
+        const sharedLink = await this.prisma.sharedLink.findUniqueOrThrow({
+            where: { id },
+        });
+        return (0, class_transformer_1.plainToInstance)(sharedLink_entity_1.SharedLink, sharedLink);
     }
 };
 exports.WarbandPrismaRepository = WarbandPrismaRepository;

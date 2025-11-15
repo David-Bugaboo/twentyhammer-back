@@ -7,4 +7,8 @@ export declare class Skill {
     description: string;
     createdAt: Date;
     skillList?: SkillList;
+    extraSkillLists?: string[];
+    extraSpellLores?: string[];
+    extraNaturalAttack?: any | null;
+    attributeModifiers?: any;
 }

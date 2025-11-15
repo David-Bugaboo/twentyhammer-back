@@ -20,6 +20,10 @@ class Skill {
     description;
     createdAt;
     skillList;
+    extraSkillLists;
+    extraSpellLores;
+    extraNaturalAttack;
+    attributeModifiers;
 }
 exports.Skill = Skill;
 __decorate([

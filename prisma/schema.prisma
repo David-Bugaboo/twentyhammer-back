@@ -28,10 +28,10 @@ model Warband {
   createdAt       DateTime           @default(now()) @map("created_at")
   userId          String             @map("user_id")
   vault           EquipmentToVault[]
+  sharedLinks     SharedLink[]
   warbandSoldiers WarbandSoldier[]
   faction         Faction            @relation(fields: [factionSlug], references: [slug], onDelete: Cascade)
   user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sharedLinks     SharedLink[]
 
   @@map("warbands")
 }
@@ -41,21 +41,20 @@ model Faction {
   slug      String       @unique @map("slug")
   name      String       @map("name")
   createdAt DateTime     @default(now()) @map("created_at")
+  jsonData  Json?        @map("json_data")
   figures   BaseFigure[]
   warbands  Warband[]
-  jsonData  Json?        @map("json_data")
-  
 
   @@map("factions")
 }
 
 model SharedLink {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @map("id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  warbandId String    @map("warband_id")
-  warband   Warband   @relation(fields: [warbandId], references: [id], onDelete: Cascade)
-  bandSnapShot Json    @map("band_snap_shot")
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @map("id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  warbandId    String   @map("warband_id")
+  bandSnapShot Json     @map("band_snap_shot")
+  warband      Warband  @relation(fields: [warbandId], references: [id], onDelete: Cascade)
 
   @@map("shared_links")
 }
@@ -68,7 +67,6 @@ model BaseFigure {
   lore                        String                       @map("lore")
   avaiability                 String[]                     @map("avaiability")
   exclusions                  String[]                     @map("exclusions")
-  upkeep                      String?
   quality                     Int                          @default(0) @map("quality")
   race                        String?                      @map("race")
   factionSlug                 String?                      @map("faction_slug")
@@ -88,9 +86,10 @@ model BaseFigure {
   canGetMutations             Boolean                      @default(false) @map("can_get_mutations")
   canGetSacredMarks           Boolean                      @default(false) @map("can_get_sacred_marks")
   noXp                        Boolean                      @default(false) @map("no_xp")
-  min                      Int?                         @map("min")
-  max                      Int?                         @map("max")
   naturalAttacks              Json?                        @map("natural_attacks")
+  upkeep                      String?
+  max                         Int?                         @map("max")
+  min                         Int?                         @map("min")
   baseFigureToWarbandSoldiers BaseFigureToWarbandSoldier[]
   faction                     Faction?                     @relation(fields: [factionSlug], references: [slug], onDelete: Cascade)
   raceLimits                  Race?                        @relation(fields: [race], references: [slug], onDelete: Cascade)
@@ -101,7 +100,6 @@ model BaseFigure {
   legendStartingSkills        LegendStartingSkills[]
   legendStartingSpells        LegendStartingSpells[]
   mercenaryStartingEquipment  MercenaryStartingEquipment[]
-
 
   @@map("base_figures")
 }
@@ -187,6 +185,7 @@ model Equipment {
   movementPenalty             Int?                         @map("movement_penalty")
   rarity                      Int                          @default(1) @map("rarity")
   slot                        Int?                         @map("slot")
+  attribute_modifiers         Json?                        @default("{\"will\": 0, \"fight\": 0, \"shoot\": 0, \"armour\": 0, \"health\": 0, \"movement\": 0, \"strength\": 0}")
   equipmentToVault            EquipmentToVault[]
   equipmentToWarbandSoldier   EquipmentToWarbandSoldier[]
   figureToAvaiableEquipments  FigureToAvaiableEquipment[]
@@ -249,9 +248,9 @@ model Modifier {
   specialRules               Json?                       @map("special_rules")
   effect                     String                      @map("effect")
   category                   String                      @map("category")
+  attributeModifiers         Json?                       @map("attribute_modifiers")
   equipmentsInVault          EquipmentToVault[]
   equipmentToWarbandSoldiers EquipmentToWarbandSoldier[]
-  attributeModifiers         Json?                       @map("attribute_modifiers")
 
   @@map("modifiers")
 }
@@ -259,28 +258,27 @@ model Modifier {
 model WarbandSoldier {
   id                     String                                @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   campaignName           String?                               @map("campaign_name")
-  notes                  String?
-  effectiveRole          Role                                  @default(HEROI) @map("effective_role")
-  active                 Boolean                               @default(true)  @map("active")
   warbandId              String                                @map("warband_id")
-  twoWeaponFighting      Boolean                               @default(false) @map("two_weapon_fighting")
   experience             Int                                   @default(0) @map("experience")
   createdAt              DateTime                              @default(now()) @map("created_at")
   extraSpecialRules      Json?                                 @map("extra_special_rules")
+  effectiveRole          Role                                  @default(HEROI) @map("effective_role")
+  promotedHeroSkills     String[]
+  miscModifiers          Json?
+  notes                  String?
+  twoWeaponFighting      Boolean                               @default(false) @map("two_weapon_fighting")
+  active                 Boolean                               @default(true) @map("active")
   advancements           AdvancementToWarbandSoldier[]
   baseFigure             BaseFigureToWarbandSoldier[]
   equipment              EquipmentToWarbandSoldier[]
   injuries               InjuryToWarbandSoldier[]
-  spells                 SpellToWarbandSoldier[]
+  promotedHeroSkillLists PromotedHeroSkillLists[]
   skills                 SkillToWarbandSoldier[]
+  spells                 SpellToWarbandSoldier[]
   supernaturalAbilities  SuperNaturalAbilityToWarbandSoldier[]
   warband                Warband                               @relation(fields: [warbandId], references: [id], onDelete: Cascade)
-  miscModifiers          Json?
-  promotedHeroSkills     String[]
   extraSkillsLists       WarbanSoldierToSKillLists[]
   extraSpellsLores       WarbandSoldierToSpellsLores[]
-  promotedHeroSkillLists PromotedHeroSkillLists[]
-
 
   @@map("warband_soldier")
 }
@@ -289,9 +287,9 @@ model PromotedHeroSkillLists {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   warbandSoldierId String         @map("warband_soldier_id")
   skillListSlug    String         @map("skill_list_slug")
+  createdAt        DateTime       @default(now()) @map("created_at")
   skillList        SkillList      @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
   warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
-  createdAt        DateTime       @default(now()) @map("created_at")
 
   @@map("promoted_hero_skill_lists")
 }
@@ -301,8 +299,8 @@ model SpellToWarbandSoldier {
   spellSlug        String         @map("spell_slug")
   warbandSoldierId String         @map("warband_soldier_id")
   createdAt        DateTime       @default(now()) @map("created_at")
-  spell            Spell          @relation(fields: [spellSlug], references: [slug], onDelete: Cascade)
   modifier         Int            @default(0)
+  spell            Spell          @relation(fields: [spellSlug], references: [slug], onDelete: Cascade)
   warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
 
   @@map("spell_to_warband_soldier")
@@ -356,10 +354,10 @@ model WarbanSoldierToSKillLists {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   warbandSoldierId String         @map("warband_soldier_id")
   skillListSlug    String         @map("skill_list_slug")
-  skillList        SkillList      @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
-  warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
   source           String         @map("source")
   createdAt        DateTime       @default(now()) @map("created_at")
+  skillList        SkillList      @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
+  warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
 
   @@map("warband_soldier_to_skill_lists")
 }
@@ -368,10 +366,10 @@ model WarbandSoldierToSpellsLores {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   warbandSoldierId String         @map("warband_soldier_id")
   spellLoreSlug    String         @map("spell_lore_slug")
-  spellLore        SpellLore      @relation(fields: [spellLoreSlug], references: [slug], onDelete: Cascade)
   source           String         @map("source")
-  warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
   createdAt        DateTime       @default(now()) @map("created_at")
+  spellLore        SpellLore      @relation(fields: [spellLoreSlug], references: [slug], onDelete: Cascade)
+  warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
 
   @@map("warband_soldier_to_spells_lores")
 }
@@ -382,13 +380,13 @@ model EquipmentToWarbandSoldier {
   warbandSoldierId String         @map("warband_soldier_id")
   customCost       Int?           @map("custom_cost")
   modifierSlug     String?        @map("modifier_slug")
-  compatible       Boolean        @map("compatibility")
   mainHandEquiped  Boolean        @default(false) @map("main_hand_eqquiped")
   offHandEquiped   Boolean        @default(false) @map("off_hand_eqquiped")
   helmetEquiped    Boolean        @default(false) @map("helmet_eqquiped")
   armorEquiped     Boolean        @default(false) @map("armor_equipped")
   twoHandedEquiped Boolean        @default(false) @map("two_handed_eqquiped")
   createdAt        DateTime       @default(now()) @map("created_at")
+  compatible       Boolean        @map("compatibility")
   equipment        Equipment      @relation(fields: [equipmentSlug], references: [slug], onDelete: Cascade)
   modifier         Modifier?      @relation(fields: [modifierSlug], references: [slug], onDelete: Cascade)
   warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
@@ -415,9 +413,9 @@ model SuperNaturalAbility {
   cost                                Int                                   @map("cost")
   category                            String                                @map("category")
   createdAt                           DateTime                              @default(now()) @map("created_at")
+  attributeModifiers                  Json?                                 @map("attribute_modifiers")
+  extraNaturalAttack                  Json?                                 @map("natural_attack")
   superNaturalAbilityToWarbandSoldier SuperNaturalAbilityToWarbandSoldier[]
-  attributeModifiers    Json?                   @map("attribute_modifiers")
-  extraNaturalAttack    Json?                   @map("natural_attack")
 
   @@map("super_natural_abilities")
 }
@@ -428,8 +426,9 @@ model Injury {
   name                   String                   @map("name")
   description            String                   @map("description")
   createdAt              DateTime                 @default(now()) @map("created_at")
+  attributeModifiers     Json?                    @map("attribute_modifiers")
   injuryToWarbandSoldier InjuryToWarbandSoldier[]
-  attributeModifiers    Json?                   @map("attribute_modifiers")
+
   @@map("injuries")
 }
 
@@ -439,8 +438,8 @@ model Advancement {
   name                        String                        @map("name")
   description                 String                        @map("description")
   createdAt                   DateTime                      @default(now()) @map("created_at")
+  attributeModifiers          Json?                         @map("attribute_modifiers")
   advancementToWarbandSoldier AdvancementToWarbandSoldier[]
-  attributeModifiers    Json?                   @map("attribute_modifiers")
 
   @@map("advancements")
 }
@@ -468,13 +467,13 @@ model Skill {
   skillListSlug         String                  @map("skill_list_slug")
   description           String                  @map("description")
   createdAt             DateTime                @default(now()) @map("created_at")
+  attributeModifiers    Json?                   @map("attribute_modifiers")
+  extraNaturalAttack    Json?                   @map("natural_attack")
+  extraSkillLists       String[]                @map("extra_skill_lists")
+  extraSpellLores       String[]                @map("extra_spell_lores")
   legendStartingSkills  LegendStartingSkills[]
   skillToWarbandSoldier SkillToWarbandSoldier[]
   skillList             SkillList               @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
-  attributeModifiers    Json?                   @map("attribute_modifiers")
-  extraNaturalAttack    Json?                   @map("natural_attack")
-  extraSkillLists       String[]                  @map("extra_skill_lists")
-  extraSpellLores       String[]                  @map("extra_spell_lores")
 
   @@map("skills")
 }
@@ -499,8 +498,8 @@ model SkillList {
   description               String                      @map("description")
   createdAt                 DateTime                    @default(now()) @map("created_at")
   figureToSkillLists        FigureToSkillList[]
-  skills                    Skill[]
   promotedHeroesSkillLists  PromotedHeroSkillLists[]
+  skills                    Skill[]
   warbanSoldierToSKillLists WarbanSoldierToSKillLists[]
 
   @@map("skill_lists")

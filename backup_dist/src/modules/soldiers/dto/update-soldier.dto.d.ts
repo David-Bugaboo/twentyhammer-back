@@ -1,5 +1,10 @@
-import { CreateSoldierDto } from './create-soldier.dto';
-declare const UpdateSoldierDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateSoldierDto>>;
-export declare class UpdateSoldierDto extends UpdateSoldierDto_base {
+import * as baseFigureEntity from 'src/entities/base-figure.entity';
+import { MiscModifiersDto } from './miscModifiers.dto';
+export declare class UpdateSoldierDto {
+    twoWeaponFighting?: boolean;
+    xp?: number;
+    effectiveRole?: baseFigureEntity.Role;
+    campaignName?: string;
+    notes?: string;
+    miscModifiers?: MiscModifiersDto;
 }
-export {};

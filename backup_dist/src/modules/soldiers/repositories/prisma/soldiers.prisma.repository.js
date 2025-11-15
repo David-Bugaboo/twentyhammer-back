@@ -99,11 +99,24 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
         });
     }
     async addSkillToSoldier(soldierId, skillSlug) {
+        const skill = await this.prisma.skill.findUniqueOrThrow({
+            where: { slug: skillSlug },
+        });
         await this.prisma.warbandSoldier.update({
             where: { id: soldierId },
             data: {
                 skills: {
                     create: { skillSlug: skillSlug },
+                },
+                extraSkillsLists: {
+                    createMany: {
+                        data: skill.extraSkillLists?.map(skillList => ({ skillListSlug: skillList, source: skill.name })) ?? [],
+                    }
+                },
+                extraSpellsLores: {
+                    createMany: {
+                        data: skill.extraSpellLores?.map(spellLore => ({ spellLoreSlug: spellLore, source: skill.name })) ?? [],
+                    }
                 },
             },
         });
@@ -173,8 +186,24 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
         });
     }
     async removeSkillFromSoldier(SkillToWarbandSoldierId) {
-        await this.prisma.skillToWarbandSoldier.delete({
-            where: { id: SkillToWarbandSoldierId },
+        await this.prisma.$transaction(async (tx) => {
+            const skillToWarbandSoldier = await tx.skillToWarbandSoldier.findUniqueOrThrow({
+                where: { id: SkillToWarbandSoldierId },
+            });
+            const skill = await tx.skill.findUniqueOrThrow({
+                where: { slug: skillToWarbandSoldier.skillSlug },
+            });
+            await tx.warbandSoldier.update({
+                where: { id: skillToWarbandSoldier.warbandSoldierId },
+                data: {
+                    skills: { delete: { id: SkillToWarbandSoldierId } },
+                    extraSkillsLists: { deleteMany: skill.extraSkillLists?.map(skillList => ({ skillListSlug: skillList })) ?? [] },
+                    extraSpellsLores: { deleteMany: skill.extraSpellLores?.map(spellLore => ({ spellLoreSlug: spellLore })) ?? [] },
+                },
+            });
+            await tx.skillToWarbandSoldier.delete({
+                where: { id: SkillToWarbandSoldierId },
+            });
         });
     }
     async killSoldier(soldierId) {
@@ -188,6 +217,7 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                 where: { id: soldierId },
                 select: {
                     warbandId: true,
+                    effectiveRole: true,
                     baseFigure: {
                         select: {
                             baseFigure: {
@@ -199,6 +229,7 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                     },
                     equipment: {
                         select: {
+                            id: true,
                             equipmentSlug: true,
                             modifierSlug: true,
                         },
@@ -213,14 +244,23 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                     },
                 },
             });
-            for (const equipment of soldier.equipment) {
-                await tx.equipmentToVault.create({
-                    data: {
-                        warbandId: soldier.warbandId,
-                        equipmentSlug: equipment.equipmentSlug,
-                        modifierSlug: equipment.modifierSlug,
-                    },
-                });
+            if (soldier.effectiveRole !== `MERCENARIO` && soldier.effectiveRole !== `LENDA`) {
+                const dagger = soldier.equipment.find(equipment => equipment.equipmentSlug === `adaga`);
+                if (dagger) {
+                    await tx.equipmentToWarbandSoldier.delete({
+                        where: { id: dagger.id },
+                    });
+                }
+                const equipmentToReturn = soldier.equipment.filter(equipment => equipment.id !== dagger?.id);
+                for (const equipment of equipmentToReturn) {
+                    await tx.equipmentToVault.create({
+                        data: {
+                            warbandId: soldier.warbandId,
+                            equipmentSlug: equipment.equipmentSlug,
+                            modifierSlug: equipment.modifierSlug,
+                        },
+                    });
+                }
             }
             await tx.warbandSoldier.delete({
                 where: {
@@ -251,6 +291,8 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                 mainHandEquiped: false,
                 offHandEquiped: false,
                 twoHandedEquiped: false,
+                armorEquiped: false,
+                helmetEquiped: false
             },
         });
     }
@@ -261,6 +303,8 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
                 mainHandEquiped: false,
                 offHandEquiped: false,
                 twoHandedEquiped: false,
+                armorEquiped: false,
+                helmetEquiped: false
             },
         });
     }
@@ -278,8 +322,109 @@ let SoldiersPrismaRepository = class SoldiersPrismaRepository {
     async equipGear(equipmentToWarbandSoldierId, slot) {
         await this.prisma.equipmentToWarbandSoldier.update({
             where: { id: equipmentToWarbandSoldierId },
-            data: {
+            data: slot === `Par` ? {
+                mainHandEquiped: true,
+                offHandEquiped: true,
+            } : {
                 [slot]: true,
+            },
+        });
+    }
+    async addExtraSkillListToSoldier(soldierId, skillListSlug, source) {
+        await this.prisma.warbandSoldier.update({
+            where: { id: soldierId },
+            data: {
+                extraSkillsLists: { create: { skillListSlug: skillListSlug, source: source } },
+            },
+        });
+    }
+    async removeExtraSkillListFromSoldier(soldierId, skillListSlug) {
+        await this.prisma.warbanSoldierToSKillLists.deleteMany({
+            where: { warbandSoldierId: soldierId, skillListSlug: skillListSlug },
+        });
+    }
+    async addExtraSpellLoreToSoldier(soldierId, spellLoreSlug, source) {
+        await this.prisma.warbandSoldier.update({
+            where: { id: soldierId },
+            data: {
+                extraSpellsLores: { create: { spellLoreSlug: spellLoreSlug, source: source } },
+            },
+        });
+    }
+    async removeExtraSpellLoreFromSoldier(soldierId, spellLoreSlug) {
+        await this.prisma.warbandSoldierToSpellsLores.deleteMany({
+            where: { warbandSoldierId: soldierId, spellLoreSlug: spellLoreSlug },
+        });
+    }
+    async updateSoldier(soldierId, updateSoldierDto) {
+        const { miscModifiers, ...rest } = updateSoldierDto;
+        await this.prisma.warbandSoldier.update({
+            where: { id: soldierId },
+            data: {
+                ...rest,
+                miscModifiers: {
+                    "fight": miscModifiers?.fight ?? 0,
+                    "shoot": miscModifiers?.shoot ?? 0,
+                    "armour": miscModifiers?.armour ?? 0,
+                    "will": miscModifiers?.will ?? 0,
+                    "health": miscModifiers?.health ?? 0,
+                    "strength": miscModifiers?.strength ?? 0,
+                }
+            },
+        });
+    }
+    async fortifySpell(spellToWarbandSoldierId) {
+        await this.prisma.spellToWarbandSoldier.update({
+            where: { id: spellToWarbandSoldierId },
+            data: {
+                modifier: {
+                    increment: 1,
+                },
+            },
+        });
+    }
+    async unfortifySpell(spellToWarbandSoldierId) {
+        await this.prisma.spellToWarbandSoldier.update({
+            where: { id: spellToWarbandSoldierId },
+            data: {
+                modifier: {
+                    decrement: 1,
+                },
+            },
+        });
+    }
+    async promoteToHero(soldierId, skillsListSlugs) {
+        await this.prisma.warbandSoldier.update({
+            where: { id: soldierId },
+            data: {
+                effectiveRole: `HEROI`,
+                extraSkillsLists: {
+                    createMany: {
+                        data: skillsListSlugs.map(skillListSlug => ({ skillListSlug: skillListSlug, source: `Promoção a héroi` })),
+                    }
+                }
+            },
+        });
+    }
+    async promoteLeader(soldierId) {
+        await this.prisma.warbandSoldier.update({
+            where: { id: soldierId },
+            data: {
+                effectiveRole: `LIDER`,
+            },
+        });
+    }
+    async toggleSoldierActive(soldierId) {
+        const soldier = await this.prisma.warbandSoldier.findUniqueOrThrow({
+            where: { id: soldierId },
+            select: {
+                active: true,
+            },
+        });
+        await this.prisma.warbandSoldier.update({
+            where: { id: soldierId },
+            data: {
+                active: { set: !soldier.active },
             },
         });
     }

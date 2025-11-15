@@ -27,9 +27,8 @@ let WarbandsService = class WarbandsService {
         this.bussinessRulesService = bussinessRulesService;
     }
     async create(createWarbandDto, userId, factionSlug) {
-        const leader = await this.bussinessRulesService.getLeader(factionSlug);
         await this.bussinessRulesService.validateFaction(factionSlug);
-        return this.repo.create(createWarbandDto, userId, factionSlug, leader);
+        return this.repo.create(createWarbandDto, userId, factionSlug);
     }
     findAll(query) {
         return this.repo.findAllWarbands(query);
@@ -39,7 +38,12 @@ let WarbandsService = class WarbandsService {
         if (warband.userId !== userId) {
             throw new common_1.ForbiddenException('Você não tem permissão para acessar este bando!');
         }
-        return warband;
+        const avaiableHirings = await this.findWarbandAvaiableHirings(warband.faction?.name ?? ``);
+        return {
+            ...warband,
+            mercenaries: avaiableHirings.filter(figure => figure.role === `MERCENARIO`),
+            legends: avaiableHirings.filter(figure => figure.role === `LENDA`),
+        };
     }
     update(id, updateWarbandDto) {
         return this.repo.updateWarband(id, updateWarbandDto);
@@ -49,6 +53,7 @@ let WarbandsService = class WarbandsService {
     }
     async addSoldierToWarband(warbandId, soldierSlug) {
         const soldier = await this.bussinessRulesService.resolveFigure(soldierSlug);
+        console.log(soldier);
         const warband = await this.resolveWarband(warbandId);
         await this.validateFigureAddition(warband, soldier);
         return this.repo.addSoldierToWarband(warbandId, soldier);
@@ -83,12 +88,35 @@ let WarbandsService = class WarbandsService {
         }
     }
     async validateFigureAddition(warband, soldier) {
+        const isMercOrLegend = soldier.role === `MERCENARIO` || soldier.role === `LENDA`;
+        const isInInclusions = soldier.avaiability.includes(warband.faction?.name ?? ``) || soldier.avaiability.includes(`Todos`);
+        const isInExclusions = soldier.exclusions.includes(warband.faction?.name ?? ``);
+        console.log(warband.faction?.name);
+        console.log(isInInclusions);
+        console.log(isInExclusions);
         if (warband.crowns < soldier.cost) {
             throw new common_1.BadRequestException(`Coroas insuficientes para comorar ${soldier.name}!`);
         }
-        if (warband.factionSlug !== soldier.factionSlug) {
+        if (warband.factionSlug !== soldier.factionSlug && !isMercOrLegend) {
             throw new common_1.BadRequestException(`${soldier.name} não pertence à facção ${warband.factionSlug}!`);
         }
+        if (isMercOrLegend && (!isInInclusions || isInExclusions)) {
+            throw new common_1.BadRequestException(`${soldier.name} Não pode ser contratado por ${warband.faction?.name ?? ``}!`);
+        }
+    }
+    async findWarbandAvaiableHirings(factionName) {
+        return this.repo.findWarbandAvaiableHirings(factionName);
+    }
+    async createSharedLink(warbandId) {
+        const warband = await this.resolveWarband(warbandId);
+        return this.repo.createSharedLink(warbandId, warband);
+    }
+    async updateSharedLink(id) {
+        const warband = await this.resolveWarband(id);
+        return this.repo.updateSharedLink(id, warband);
+    }
+    async findSharedLinkById(id) {
+        return this.repo.findSharedLinkById(id);
     }
 };
 exports.WarbandsService = WarbandsService;

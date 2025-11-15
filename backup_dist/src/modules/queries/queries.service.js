@@ -99,6 +99,17 @@ let QueriesService = class QueriesService {
             throw new common_1.NotFoundException('Equipamento não encontrado no inventário.');
         }
     }
+    findSkillToWarbandSoldierById(id) {
+        return this.repo.findSkillToWarbandSoldierById(id);
+    }
+    async findSpellToWarbandSoldierById(id) {
+        try {
+            return await this.repo.findSpellToWarbandSoldierById(id);
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('Feitiço não encontrado no inventário.');
+        }
+    }
 };
 exports.QueriesService = QueriesService;
 exports.QueriesService = QueriesService = __decorate([

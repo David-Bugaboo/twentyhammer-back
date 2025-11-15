@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoldiersController = void 0;
 const common_1 = require("@nestjs/common");
 const soldiers_service_1 = require("./soldiers.service");
+const update_soldier_dto_1 = require("./dto/update-soldier.dto");
+const promote_hero_dto_1 = require("./dto/promote-hero.dto");
 let SoldiersController = class SoldiersController {
     soldiersService;
     constructor(soldiersService) {
@@ -73,6 +75,24 @@ let SoldiersController = class SoldiersController {
     }
     async removeSuperNaturalAbilityFromSoldier(superNaturalAbilityToWarbandSoldierId) {
         await this.soldiersService.removeSuperNaturalAbilityFromSoldier(superNaturalAbilityToWarbandSoldierId);
+    }
+    async updateSoldier(soldierId, updateSoldierDto) {
+        await this.soldiersService.updateSoldier(soldierId, updateSoldierDto);
+    }
+    async fortifySpell(spellToWarbandSoldierId) {
+        await this.soldiersService.fortifySpell(spellToWarbandSoldierId);
+    }
+    async unfortifySpell(spellToWarbandSoldierId) {
+        await this.soldiersService.unfortifySpell(spellToWarbandSoldierId);
+    }
+    async promoteToHero(soldierId, promoteHeroDto) {
+        await this.soldiersService.promoteToHero(soldierId, promoteHeroDto.skillsListSlugs);
+    }
+    async promoteLeader(soldierId) {
+        await this.soldiersService.promoteLeader(soldierId);
+    }
+    async toggleSoldierActive(soldierId) {
+        await this.soldiersService.toggleSoldierActive(soldierId);
     }
 };
 exports.SoldiersController = SoldiersController;
@@ -211,6 +231,50 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], SoldiersController.prototype, "removeSuperNaturalAbilityFromSoldier", null);
+__decorate([
+    (0, common_1.Patch)(':soldierId'),
+    __param(0, (0, common_1.Param)('soldierId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_soldier_dto_1.UpdateSoldierDto]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "updateSoldier", null);
+__decorate([
+    (0, common_1.Post)(':soldierId/spells/:spellToWarbandSoldierId/fortify'),
+    __param(0, (0, common_1.Param)('spellToWarbandSoldierId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "fortifySpell", null);
+__decorate([
+    (0, common_1.Post)(':soldierId/spells/:spellToWarbandSoldierId/unfortify'),
+    __param(0, (0, common_1.Param)('spellToWarbandSoldierId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "unfortifySpell", null);
+__decorate([
+    (0, common_1.Post)(':soldierId/promote/hero'),
+    __param(0, (0, common_1.Param)('soldierId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, promote_hero_dto_1.PromoteHeroDto]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "promoteToHero", null);
+__decorate([
+    (0, common_1.Post)(':soldierId/promote/leader'),
+    __param(0, (0, common_1.Param)('soldierId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "promoteLeader", null);
+__decorate([
+    (0, common_1.Post)(':soldierId/toggle'),
+    __param(0, (0, common_1.Param)('soldierId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SoldiersController.prototype, "toggleSoldierActive", null);
 exports.SoldiersController = SoldiersController = __decorate([
     (0, common_1.Controller)('soldiers'),
     __metadata("design:paramtypes", [soldiers_service_1.SoldiersService])

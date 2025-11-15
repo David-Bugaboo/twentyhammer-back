@@ -2,6 +2,7 @@ import { PrismaService } from 'prisma/services/prisma.service';
 import { SoldiersRepository } from '../soldiers.repository';
 import { WarbandSoldier } from '../../entities/warband-soldier.entity';
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
+import { UpdateSoldierDto } from '../../dto/update-soldier.dto';
 export declare class SoldiersPrismaRepository implements SoldiersRepository {
     private readonly prisma;
     constructor(prisma: PrismaService);
@@ -25,4 +26,14 @@ export declare class SoldiersPrismaRepository implements SoldiersRepository {
     unequipGear(equipmentToWarbandSoldierId: string): Promise<void>;
     unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
     equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
+    addExtraSkillListToSoldier(soldierId: string, skillListSlug: string, source: string): Promise<void>;
+    removeExtraSkillListFromSoldier(soldierId: string, skillListSlug: string): Promise<void>;
+    addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void>;
+    removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void>;
+    updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
+    fortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    unfortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    promoteToHero(soldierId: string, skillsListSlugs: string[]): Promise<void>;
+    promoteLeader(soldierId: string): Promise<void>;
+    toggleSoldierActive(soldierId: string): Promise<void>;
 }

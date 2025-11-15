@@ -18,6 +18,7 @@ class SpellToWarbandSoldier {
     warbandSoldierId;
     createdAt;
     spell;
+    modifier;
 }
 exports.SpellToWarbandSoldier = SpellToWarbandSoldier;
 __decorate([

@@ -22,6 +22,8 @@ import { FactionQueryDto } from '../dto/faction-query.dto';
 import { BaseFigureQueryDto } from '../dto/base-figure-query.dto';
 import { EquipmentToWarbandSoldier } from 'src/modules/soldiers/entities/equipment-to-warband-soldier.entity';
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
+import { SkillToWarbandSoldier } from 'src/modules/soldiers/entities/skill-to-warband-soldier.entity';
+import { SpellToWarbandSoldier } from 'src/modules/soldiers/entities/spell-to-warband-soldier.entity';
 export declare abstract class QueriesRepository {
     abstract findAllSpellLores(spellLoresQueryDto: SpellLoresQueryDto): Promise<SpellLore[]>;
     abstract findAllSpells(spellQueryDto: SpellQueryDto): Promise<Spell[]>;
@@ -47,4 +49,6 @@ export declare abstract class QueriesRepository {
     abstract findBaseFigureByslug(slug: string): Promise<BaseFigure>;
     abstract findEquipmentToWarbandSoldierById(id: string): Promise<EquipmentToWarbandSoldier>;
     abstract findEquipmentToVaultById(id: string): Promise<EquipmentToVault>;
+    abstract findSkillToWarbandSoldierById(id: string): Promise<SkillToWarbandSoldier>;
+    abstract findSpellToWarbandSoldierById(id: string): Promise<SpellToWarbandSoldier>;
 }

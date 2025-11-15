@@ -26,6 +26,9 @@ let SoldiersService = class SoldiersService {
         this.queriesService = queriesService;
         this.bussinessRulesService = bussinessRulesService;
     }
+    async updateSoldier(soldierId, updateSoldierDto) {
+        return this.repo.updateSoldier(soldierId, updateSoldierDto);
+    }
     async findSoldierById(soldierId) {
         try {
             return await this.repo.findSoldierById(soldierId);
@@ -55,21 +58,30 @@ let SoldiersService = class SoldiersService {
         const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
         const soldierSpells = soldier.spells?.map(spell => spell.spellSlug) ?? [];
         const soldierSpellLores = soldier.baseFigure?.[0]?.baseFigure?.spellLores?.map(spellLore => spellLore.spellLoreSlug) ?? [];
-        await this.bussinessRulesService.validateSpell(spellSlug, soldierSpellLores, soldierSpells, soldierSkills);
+        const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
+        await this.bussinessRulesService.validateSpell(spellSlug, soldierSpellLores, soldierSpells, soldierSkills, soldierAdvancements);
         return this.repo.addSpellToSoldier(soldierId, spellSlug);
     }
     async addSkillToSoldier(soldierId, skillSlug) {
         const soldier = await this.repo.findSoldierById(soldierId);
-        const soldierPromotedHeroSkillLists = soldier.promotedHeroSkillLists?.map(skillList => skillList.skillListSlug) ?? [];
+        const soldierExtraSkillLists = soldier.extraSkillLists?.map(skillList => skillList.skillListSlug) ?? [];
         const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
         const soldierSkillLists = soldier.baseFigure?.[0]?.baseFigure?.skillLists?.map(skillList => skillList.skillListSlug) ?? [];
-        await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierPromotedHeroSkillLists]);
+        const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
+        await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists], soldierAdvancements);
         return this.repo.addSkillToSoldier(soldierId, skillSlug);
     }
     async removeSpellFromSoldier(warbandSoldierSpellId) {
         return this.repo.removeSpellFromSoldier(warbandSoldierSpellId);
     }
     async removeSkillFromSoldier(warbandToSoldierItemId) {
+        const skill = await this.queriesService.findSkillToWarbandSoldierById(warbandToSoldierItemId);
+        if (skill.skillSlug === 'corpo-treinado') {
+            await this.repo.removeExtraSkillListFromSoldier(skill.warbandSoldierId, 'forca');
+        }
+        if (skill.skillSlug === 'aprendizado-arcano') {
+            await this.repo.removeExtraSpellLoreFromSoldier(skill.warbandSoldierId, 'magia-inferior');
+        }
         return this.repo.removeSkillFromSoldier(warbandToSoldierItemId);
     }
     async killSoldier(soldierId) {
@@ -115,6 +127,7 @@ let SoldiersService = class SoldiersService {
         const soldierInjuries = soldier.injuries?.map(injury => injury.injurySlug);
         const soldierArmor = soldier.equipment?.find(equipment => equipment.armorEquiped === true);
         const soldierHelmet = soldier.equipment?.find(equipment => equipment.helmetEquiped === true);
+        const equipmentSpecialRules = this.bussinessRulesService.normalizeSpecialRules(warbandSoldierEquipment?.equipment?.specialRules);
         if (slot === `armorEquiped` && soldierArmor) {
             await this.bussinessRulesService.validateArmor(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
@@ -130,10 +143,27 @@ let SoldiersService = class SoldiersService {
         if (slot === `mainHandEquiped`) {
             await this.bussinessRulesService.validateMainHand(warbandSoldierEquipment.equipment, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
         }
+        if (equipmentSpecialRules.some(rule => rule.label === `Par`)) {
+            slot = `Par`;
+        }
         await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
+        const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldier.id);
+        await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
     }
     async unequipItemFromSoldier(equipmentToWarbandSoldierId) {
+        const warbandSoldierEquipment = await this.queriesService.findEquipmentToWarbandSoldierById(equipmentToWarbandSoldierId);
+        const soldier = await this.repo.findSoldierById(warbandSoldierEquipment.warbandSoldierId);
         await this.repo.unequipGear(equipmentToWarbandSoldierId);
+        const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldier.id);
+        await this.repo.updateSoldier(soldier.id, { twoWeaponFighting });
+    }
+    async defineIfTwoWeaponFighting(soldierId) {
+        const soldier = await this.repo.findSoldierById(soldierId);
+        const soldierEquipment = soldier.equipment ?? [];
+        const soldierInjuries = soldier.injuries ?? [];
+        const soldierSkills = soldier.skills ?? [];
+        const soldierSuperNaturalAbilities = soldier.supernaturalAbilities ?? [];
+        return await this.bussinessRulesService.checkIfTwoWeaponFighting(soldierEquipment ?? [], soldierSkills ?? [], soldierInjuries ?? [], soldierSuperNaturalAbilities ?? []);
     }
     async unequipSlotFromSoldier(soldierId, slot) {
         const allowedSlots = [
@@ -146,8 +176,55 @@ let SoldiersService = class SoldiersService {
         if (!allowedSlots.includes(slot)) {
             throw new common_1.BadRequestException('Slot inválido para desequipar.');
         }
-        await this.repo.findSoldierById(soldierId);
         await this.repo.unequipSlotFromSoldier(soldierId, slot);
+        const twoWeaponFighting = await this.defineIfTwoWeaponFighting(soldierId);
+        await this.repo.updateSoldier(soldierId, { twoWeaponFighting });
+    }
+    async fortifySpell(spellToWarbandSoldierId) {
+        const spell = await this.queriesService.findSpellToWarbandSoldierById(spellToWarbandSoldierId);
+        if (spell.spell?.difficultyClass - spell.modifier <= 6) {
+            throw new common_1.BadRequestException('Feitiço chegou ao limite de forticação.');
+        }
+        return this.repo.fortifySpell(spellToWarbandSoldierId);
+    }
+    async unfortifySpell(spellToWarbandSoldierId) {
+        const spell = await this.queriesService.findSpellToWarbandSoldierById(spellToWarbandSoldierId);
+        const soldier = await this.repo.findSoldierById(spell.warbandSoldierId);
+        const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
+        const soldierSpells = soldier.spells;
+        const howManySpellFortifies = soldierSpells?.reduce((acc, spell) => acc + spell.modifier, 0) ?? 0;
+        const howManyFortifyAdvancements = soldierAdvancements.filter(advancement => advancement === `fortalecer-magia`).length;
+        if (howManySpellFortifies >= howManyFortifyAdvancements) {
+            throw new common_1.BadRequestException('sem avanços de fortificação de magia suficientes para desfortificar uma magia!');
+        }
+        if (spell.modifier === 0) {
+            throw new common_1.BadRequestException('Feitiço não fortificado.');
+        }
+        return this.repo.unfortifySpell(spellToWarbandSoldierId);
+    }
+    async promoteToHero(soldierId, skillsListSlugs) {
+        const soldier = await this.repo.findSoldierById(soldierId);
+        const warband = await this.warbandRepo.resolveWarband(soldier.warbandId);
+        const factionFigures = await this.queriesService.findAllBaseFigures({ factionSlug: warband.factionSlug });
+        const factionSkillLists = factionFigures.flatMap(figure => figure.skillLists?.map(skillList => skillList.skillListSlug));
+        if (skillsListSlugs.every(skillList => factionSkillLists.includes(skillList))) {
+            await this.repo.promoteToHero(soldierId, skillsListSlugs);
+        }
+        else {
+            throw new common_1.BadRequestException('Listas de habilidades inválida.');
+        }
+    }
+    async promoteLeader(soldierId) {
+        const soldier = await this.repo.findSoldierById(soldierId);
+        const warband = await this.warbandRepo.resolveWarband(soldier.warbandId);
+        const leader = warband.warbandSoldiers?.find(warbandSoldier => warbandSoldier.effectiveRole === `LENDA`);
+        if (leader) {
+            throw new common_1.BadRequestException('Já existe um líder no bando.');
+        }
+        await this.repo.promoteLeader(soldierId);
+    }
+    async toggleSoldierActive(soldierId) {
+        return this.repo.toggleSoldierActive(soldierId);
     }
 };
 exports.SoldiersService = SoldiersService;

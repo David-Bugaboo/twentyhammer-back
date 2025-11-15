@@ -24,6 +24,8 @@ import { ModifierQueryDto } from '../../dto/modifier-query.dto';
 import { QueriesRepository } from '../queries.repository';
 import { EquipmentToWarbandSoldier } from 'src/modules/soldiers/entities/equipment-to-warband-soldier.entity';
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
+import { SkillToWarbandSoldier } from 'src/modules/soldiers/entities/skill-to-warband-soldier.entity';
+import { SpellToWarbandSoldier } from 'src/modules/soldiers/entities/spell-to-warband-soldier.entity';
 export declare class QueriesPrismaRepository implements QueriesRepository {
     private readonly prisma;
     constructor(prisma: PrismaService);
@@ -51,4 +53,6 @@ export declare class QueriesPrismaRepository implements QueriesRepository {
     findBaseFigureByslug(slug: string): Promise<BaseFigure>;
     findEquipmentToWarbandSoldierById(id: string): Promise<EquipmentToWarbandSoldier>;
     findEquipmentToVaultById(id: string): Promise<EquipmentToVault>;
+    findSkillToWarbandSoldierById(id: string): Promise<SkillToWarbandSoldier>;
+    findSpellToWarbandSoldierById(id: string): Promise<SpellToWarbandSoldier>;
 }
