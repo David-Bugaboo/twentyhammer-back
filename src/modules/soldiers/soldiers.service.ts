@@ -5,6 +5,8 @@ import { QueriesService } from '../queries/queries.service';
 import { BussinessRulesService } from '../bussiness-rules/bussiness-rules.service';
 import { UpdateSoldierDto } from './dto/update-soldier.dto';
 
+
+
 @Injectable()
 export class SoldiersService {
   constructor(
@@ -13,7 +15,6 @@ export class SoldiersService {
     private readonly queriesService: QueriesService,
     private readonly bussinessRulesService: BussinessRulesService,
   ) {}
-
   async updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto) {
     return this.repo.updateSoldier(soldierId, updateSoldierDto);
   }
@@ -55,8 +56,11 @@ export class SoldiersService {
     const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
     const soldierSpells = soldier.spells?.map(spell => spell.spellSlug) ?? [];
     const soldierSpellLores = soldier.baseFigure?.[0]?.baseFigure?.spellLores?.map(spellLore => spellLore.spellLoreSlug) ?? [];
-    const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];                                       
-    await this.bussinessRulesService.validateSpell(spellSlug, soldierSpellLores, soldierSpells, soldierSkills, soldierAdvancements);
+    const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? []; 
+    const soldierExtraSpellLores = soldier.extraSpellsLores?.map(spellLore => spellLore.spellLoreSlug) ?? [];
+
+
+    await this.bussinessRulesService.validateSpell(spellSlug, soldierSpellLores, soldierSpells, soldierSkills, soldierAdvancements, soldierExtraSpellLores);
 
     return this.repo.addSpellToSoldier(soldierId, spellSlug);
   }
@@ -66,8 +70,9 @@ export class SoldiersService {
     const soldierSkills = soldier.skills?.map(skill => skill.skillSlug) ?? [];
     const soldierSkillLists = soldier.baseFigure?.[0]?.baseFigure?.skillLists?.map(skillList => skillList.skillListSlug) ?? [];
     const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
+    
 
-    await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists], soldierAdvancements);
+    await this.bussinessRulesService.validateSkill(skillSlug, soldierSkills, [...soldierSkillLists, ...soldierExtraSkillLists], soldierAdvancements, soldierExtraSkillLists);
     
     return this.repo.addSkillToSoldier(soldierId, skillSlug);
   }
@@ -196,12 +201,6 @@ export class SoldiersService {
     await this.repo.updateSoldier(soldierId, { twoWeaponFighting });
   }
   async fortifySpell(spellToWarbandSoldierId: string) {
-    const spell = await this.queriesService.findSpellToWarbandSoldierById(spellToWarbandSoldierId);
-
-    if (spell.spell?.difficultyClass! - spell.modifier <= 6) {
-      throw new BadRequestException('Feitiço chegou ao limite de forticação.');
-    }
-    
     return this.repo.fortifySpell(spellToWarbandSoldierId);
   }
   async unfortifySpell(spellToWarbandSoldierId: string) {
@@ -249,6 +248,4 @@ export class SoldiersService {
   async toggleSoldierActive(soldierId: string) {
     return this.repo.toggleSoldierActive(soldierId);
   }
-
-  
 }

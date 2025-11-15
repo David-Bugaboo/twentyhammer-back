@@ -204,16 +204,11 @@ export class BussinessRulesService {
     warbandSoldierSkills: string[],
     warbandSoldierSkillLists: string[],
     warbandSoldierAdvancements: string[],
+    warbandSoldierExtraSkillsLists: string[]
   ): Promise<void> {
-    const hasSkillLists = warbandSoldierSkillLists.length > 0;
+    const hasSkillLists = warbandSoldierSkillLists.length > 0 || warbandSoldierExtraSkillsLists.length > 0;
 
-    const howManySkillAdvancements = warbandSoldierAdvancements.filter(advancement => advancement === `nova-habilidade`).length;
     
-    const howManySkills = warbandSoldierSkills.length 
-
-    if(howManySkills >= howManySkillAdvancements) {
-      throw new BadRequestException('sem avanços de habilidade suficientes para aprender uma habilidade!');
-    }
 
 
     if (!hasSkillLists) {
@@ -254,22 +249,15 @@ export class BussinessRulesService {
     warbandSoldierSpells: string[],
     warbandSoldierSkills: string[],
     warbandSoldierAdvancements: string[],
+    warbandSoldierExtraSpellLores: string[],
   ): Promise<void> {
-    const hasSpellLore = warbandSoldierSpellLores.length > 0;
+    const hasSpellLore = warbandSoldierSpellLores.length > 0 || warbandSoldierExtraSpellLores.length > 0;
     const hasArcaneLearning =
       warbandSoldierSkills.includes(`aprendizado-arcano`);
-    const isCaster = hasSpellLore || hasArcaneLearning;
+    const isCaster = hasSpellLore 
     const spellAlreadyKnown = warbandSoldierSpells.includes(spellSlug);
-    const howManySpellAdvancements = warbandSoldierAdvancements.filter(advancement => advancement === `nova-magia`).length;
-    const howManySpells = warbandSoldierSpells.length;
+    
 
-    if(howManySpells >= howManySpellAdvancements) {
-      throw new BadRequestException('sem avanços de magia suficientes para aprender uma magia!');
-    }
-
-    if(howManySpells >= howManySpellAdvancements) {
-      throw new BadRequestException('sem avanços de magia suficientes para aprender uma magia!');
-    }
 
     if (!isCaster) {
       throw new BadRequestException('Figura não é um conjurador!');
