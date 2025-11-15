@@ -153,7 +153,7 @@ export class SoldiersService {
       await this.bussinessRulesService.validateMainHand(warbandSoldierEquipment.equipment!, soldier.supernaturalAbilities?.map(superNaturalAbility => superNaturalAbility.superNaturalAbilitySlug) ?? [], soldierInjuries ?? [], soldierEquipment ?? []);
     }
 
-    if(equipmentSpecialRules.some(rule => rule.label === `Par`) && slot === `offHandEquiped`) {
+    if(equipmentSpecialRules.some(rule => rule.label === `Par`)) {
       slot = `Par`
     }
     await this.repo.equipGear(equipmentToWarbandSoldierId, slot);
