@@ -53,7 +53,11 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         modifier: true,
       },
     },
-    sharedLinks: true,
+    sharedLinks: {
+      select: {
+        id: true,
+      },
+    },
     warbandSoldiers: {
       include: {
         advancements: {
