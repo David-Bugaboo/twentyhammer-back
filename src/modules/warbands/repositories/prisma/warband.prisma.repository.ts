@@ -38,7 +38,11 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         },
       },
     },
-    sharedLinks: true,
+    sharedLinks: {
+      select: {
+        id: true,
+      }
+    },
   };
   private readonly fullWarbandInclude = {
     faction: true,
