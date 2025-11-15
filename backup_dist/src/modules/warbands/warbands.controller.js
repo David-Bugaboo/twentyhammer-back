@@ -64,6 +64,15 @@ let WarbandsController = class WarbandsController {
     fireSoldierFromWarband(warbandId, warbandToSoldierId) {
         return this.warbandsService.fireSoldierFromWarband(warbandId, warbandToSoldierId);
     }
+    shareWarband(id) {
+        return this.warbandsService.createSharedLink(id);
+    }
+    updateSharedLink(id) {
+        return this.warbandsService.updateSharedLink(id);
+    }
+    findSharedLinkById(id) {
+        return this.warbandsService.findSharedLinkById(id);
+    }
 };
 exports.WarbandsController = WarbandsController;
 __decorate([
@@ -145,6 +154,27 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], WarbandsController.prototype, "fireSoldierFromWarband", null);
+__decorate([
+    (0, common_1.Post)(':id/share'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WarbandsController.prototype, "shareWarband", null);
+__decorate([
+    (0, common_1.Patch)(':id/share'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WarbandsController.prototype, "updateSharedLink", null);
+__decorate([
+    (0, common_1.Get)('shared-link/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], WarbandsController.prototype, "findSharedLinkById", null);
 exports.WarbandsController = WarbandsController = __decorate([
     (0, common_1.Controller)('warbands'),
     __metadata("design:paramtypes", [warbands_service_1.WarbandsService,

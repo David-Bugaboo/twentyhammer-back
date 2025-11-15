@@ -324,7 +324,6 @@ export class QueriesPrismaRepository implements QueriesRepository {
             skillList: true,
           },
         },
-
         spellLores: {
           include: {
             spellLore: true,
@@ -339,6 +338,11 @@ export class QueriesPrismaRepository implements QueriesRepository {
           include: {
             skill: true,
           },
+        },
+        legendStartingEquipment: {
+          include: {
+            equipment:true
+          }
         },
         mercenaryStartingEquipment: {
           include: {

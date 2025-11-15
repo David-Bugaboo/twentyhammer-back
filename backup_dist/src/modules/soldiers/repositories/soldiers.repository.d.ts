@@ -1,5 +1,6 @@
 import { EquipmentToVault } from 'src/modules/warbands/entities/equipment-to-vault.entity';
 import { WarbandSoldier } from '../entities/warband-soldier.entity';
+import { UpdateSoldierDto } from '../dto/update-soldier.dto';
 export declare abstract class SoldiersRepository {
     abstract removeSoldierFromWarband(soldierId: string, kill: boolean): any;
     abstract findSoldierById(soldierId: string): Promise<WarbandSoldier>;
@@ -21,4 +22,14 @@ export declare abstract class SoldiersRepository {
     abstract unequipGear(equipmentToWarbandSoldierId: string): Promise<void>;
     abstract unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
     abstract equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
+    abstract addExtraSkillListToSoldier(soldierId: string, skillListSlug: string, source: string): Promise<void>;
+    abstract removeExtraSkillListFromSoldier(soldierId: string, skillListSlug: string): Promise<void>;
+    abstract addExtraSpellLoreToSoldier(soldierId: string, spellLoreSlug: string, source: string): Promise<void>;
+    abstract removeExtraSpellLoreFromSoldier(soldierId: string, spellLoreSlug: string): Promise<void>;
+    abstract updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
+    abstract fortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    abstract unfortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    abstract promoteToHero(soldierId: string, skillsListSlugs: string[]): Promise<void>;
+    abstract promoteLeader(soldierId: string): Promise<void>;
+    abstract toggleSoldierActive(soldierId: string): Promise<void>;
 }

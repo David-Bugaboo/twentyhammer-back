@@ -8,7 +8,6 @@ import { SkillToWarbandSoldier } from './skill-to-warband-soldier.entity';
 import { SpellToWarbandSoldier } from './spell-to-warband-soldier.entity';
 import { AdvancementToWarbandSoldier } from './advancement-to-warband-soldier.entity';
 import { SuperNaturalAbilityToWarbandSoldier } from './super-natural-ability-to-warband-soldier.entity';
-import { PromotedHeroSkillLists } from './promoted-hero-skill-list.entity';
 import type { Role } from 'src/entities/base-figure.entity';
 import { Warband } from 'src/modules/warbands/entities/warband.entity';
 export declare class WarbandSoldier {
@@ -16,6 +15,7 @@ export declare class WarbandSoldier {
     campaignName?: string | null;
     warbandId: string;
     experience: number;
+    active: boolean;
     effectiveRole?: Role | null;
     createdAt: Date;
     extraSpecialRules?: unknown;
@@ -29,6 +29,5 @@ export declare class WarbandSoldier {
     skills?: SkillToWarbandSoldier[];
     spells?: SpellToWarbandSoldier[];
     supernaturalAbilities?: SuperNaturalAbilityToWarbandSoldier[];
-    promotedHeroSkillLists?: PromotedHeroSkillLists[];
     warband?: Warband;
 }

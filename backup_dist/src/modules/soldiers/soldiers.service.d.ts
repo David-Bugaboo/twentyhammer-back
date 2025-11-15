@@ -2,12 +2,14 @@ import { SoldiersRepository } from './repositories/soldiers.repository';
 import { WarbandsService } from '../warbands/warbands.service';
 import { QueriesService } from '../queries/queries.service';
 import { BussinessRulesService } from '../bussiness-rules/bussiness-rules.service';
+import { UpdateSoldierDto } from './dto/update-soldier.dto';
 export declare class SoldiersService {
     private readonly repo;
     private readonly warbandRepo;
     private readonly queriesService;
     private readonly bussinessRulesService;
     constructor(repo: SoldiersRepository, warbandRepo: WarbandsService, queriesService: QueriesService, bussinessRulesService: BussinessRulesService);
+    updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
     findSoldierById(soldierId: string): Promise<import("./entities/warband-soldier.entity").WarbandSoldier>;
     removeEquipmentFromSoldier(soldierId: string, warbandToSoldierItem: string): Promise<void>;
     addEquipmentToSoldier(soldierId: string, warbandVaultItem: string): Promise<void>;
@@ -26,5 +28,11 @@ export declare class SoldiersService {
     removeSuperNaturalAbilityFromSoldier(superNaturalAbilityToWarbandSoldierId: string): Promise<void>;
     equipItemToSoldier(equipmentToWarbandSoldierId: string, slot: string): Promise<void>;
     unequipItemFromSoldier(equipmentToWarbandSoldierId: string): Promise<void>;
+    defineIfTwoWeaponFighting(soldierId: string): Promise<boolean>;
     unequipSlotFromSoldier(soldierId: string, slot: string): Promise<void>;
+    fortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    unfortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    promoteToHero(soldierId: string, skillsListSlugs: string[]): Promise<void>;
+    promoteLeader(soldierId: string): Promise<void>;
+    toggleSoldierActive(soldierId: string): Promise<void>;
 }

@@ -19,7 +19,21 @@ export declare class WarbandsService {
         totalPages: number;
         warbands: Warband[];
     }>;
-    findOne(id: string, userId: string): Promise<Warband>;
+    findOne(id: string, userId: string): Promise<{
+        mercenaries: BaseFigure[];
+        legends: BaseFigure[];
+        id: string;
+        name: string;
+        crowns: number;
+        wyrdstone: number;
+        factionSlug: string;
+        userId: string;
+        vault?: import("./entities/equipment-to-vault.entity").EquipmentToVault[];
+        warbandSoldiers?: import("../soldiers/entities/warband-soldier.entity").WarbandSoldier[];
+        faction?: import("./entities/faction.entity").Faction | null;
+        user?: import("../../entities/user.entity").User | null;
+        createdAt: Date;
+    }>;
     update(id: string, updateWarbandDto: UpdateWarbandDto): Promise<Warband>;
     remove(id: string): Promise<void>;
     addSoldierToWarband(warbandId: string, soldierSlug: string): Promise<Warband>;
@@ -28,4 +42,8 @@ export declare class WarbandsService {
     fireSoldierFromWarband(warbandId: string, warbandToSoldierId: string): Promise<Warband>;
     resolveWarband(id: string): Promise<Warband>;
     validateFigureAddition(warband: Warband, soldier: BaseFigure): Promise<void>;
+    findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]>;
+    createSharedLink(warbandId: string): Promise<import("./entities/sharedLink.entity").SharedLink>;
+    updateSharedLink(id: string): Promise<import("./entities/sharedLink.entity").SharedLink>;
+    findSharedLinkById(id: string): Promise<import("./entities/sharedLink.entity").SharedLink>;
 }

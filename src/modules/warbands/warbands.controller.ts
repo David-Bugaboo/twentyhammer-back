@@ -108,4 +108,16 @@ export class WarbandsController {
       warbandToSoldierId,
     );
   }
+  @Post(':id/share')
+  shareWarband(@Param('id') id: string) {
+    return this.warbandsService.createSharedLink(id);
+  }
+  @Patch(':id/share')
+  updateSharedLink(@Param('id') id: string) {
+    return this.warbandsService.updateSharedLink(id);
+  }
+  @Get('shared-link/:id')
+  findSharedLinkById(@Param('id') id: string) {
+    return this.warbandsService.findSharedLinkById(id);
+  }
 }

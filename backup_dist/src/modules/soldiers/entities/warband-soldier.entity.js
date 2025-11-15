@@ -28,6 +28,7 @@ class WarbandSoldier {
     campaignName;
     warbandId;
     experience;
+    active;
     effectiveRole;
     createdAt;
     extraSpecialRules;
@@ -41,7 +42,6 @@ class WarbandSoldier {
     skills;
     spells;
     supernaturalAbilities;
-    promotedHeroSkillLists;
     warband;
 }
 exports.WarbandSoldier = WarbandSoldier;
@@ -87,9 +87,6 @@ __decorate([
 ], WarbandSoldier.prototype, "supernaturalAbilities", void 0);
 __decorate([
     (0, class_transformer_1.Type)(() => promoted_hero_skill_list_entity_1.PromotedHeroSkillLists),
-    __metadata("design:type", Array)
-], WarbandSoldier.prototype, "promotedHeroSkillLists", void 0);
-__decorate([
     (0, class_transformer_1.Type)(() => warband_entity_1.Warband),
     __metadata("design:type", warband_entity_1.Warband)
 ], WarbandSoldier.prototype, "warband", void 0);

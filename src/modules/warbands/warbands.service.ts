@@ -58,6 +58,7 @@ export class WarbandsService {
   }
   async addSoldierToWarband(warbandId: string, soldierSlug: string) {
     const soldier = await this.bussinessRulesService.resolveFigure(soldierSlug);
+    console.log(soldier)
     const warband = await this.resolveWarband(warbandId);
     await this.validateFigureAddition(warband, soldier);
     return this.repo.addSoldierToWarband(warbandId, soldier);
@@ -144,5 +145,16 @@ export class WarbandsService {
   }
   async findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]> {
     return this.repo.findWarbandAvaiableHirings(factionName);
+  }
+  async createSharedLink(warbandId: string) {
+    const warband = await this.resolveWarband(warbandId);
+    return this.repo.createSharedLink(warbandId, warband);
+  }
+  async updateSharedLink(id: string) {
+    const warband = await this.resolveWarband(id);
+    return this.repo.updateSharedLink(id, warband);
+  }
+  async findSharedLinkById(id: string) {
+    return this.repo.findSharedLinkById(id);
   }
 }

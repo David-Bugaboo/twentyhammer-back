@@ -44,6 +44,10 @@ class BaseFigure {
     avaiableEquipment;
     skillLists;
     spellLores;
+    mercenaryStartingEquipment;
+    legendStartingEquipment;
+    legendStartingSpells;
+    legendStartingSkills;
 }
 exports.BaseFigure = BaseFigure;
 __decorate([

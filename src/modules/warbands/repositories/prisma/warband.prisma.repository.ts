@@ -10,6 +10,7 @@ import { Equipment } from 'src/entities/equipment.entity';
 import { Modifier } from 'src/entities/modifier.entity';
 import { Role } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
+import { SharedLink } from '../../entities/sharedLink.entity';
 
 @Injectable()
 export class WarbandPrismaRepository implements WarbandsRepository {
@@ -37,6 +38,11 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         },
       },
     },
+    sharedLinks: {
+      select: {
+        id: true,
+      }
+    },
   };
   private readonly fullWarbandInclude = {
     faction: true,
@@ -45,6 +51,11 @@ export class WarbandPrismaRepository implements WarbandsRepository {
       include: {
         equipment: true,
         modifier: true,
+      },
+    },
+    sharedLinks: {
+      select: {
+        id: true,
       },
     },
     warbandSoldiers: {
@@ -231,6 +242,14 @@ export class WarbandPrismaRepository implements WarbandsRepository {
       compatible: true,
       equipmentSlug: `adaga`
     }] : []
+    startingEquipment.push(...soldier.mercenaryStartingEquipment?.map(equipment => ({
+                    compatible: true,
+                    equipmentSlug: equipment.equipmentSlug,
+    }))!)
+    startingEquipment.push(...soldier.legendStartingEquipment?.map(equipment => ({
+                    compatible: true,
+                    equipmentSlug: equipment.equipmentSlug,
+    }))!)
     const updated = await this.prisma.$transaction(async (tx) => {
       const warband = await tx.warband.findUniqueOrThrow({
         where: {
@@ -267,16 +286,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
               equipment: {
                 createMany: {
                   data: [
-                  ...startingEquipment,
-                 
-                 ...soldier.mercenaryStartingEquipment?.map(equipment => ({
-                    compatible: true,
-                    equipmentSlug: equipment.equipmentSlug,
-                 })) ?? [],
-                 ...soldier.legendStartingEquipment?.map(equipment => ({
-                  compatible: true,
-                  equipmentSlug: equipment.equipmentSlug,
-                 })) ?? [],
+                  ...startingEquipment
                 ]},
               },
               spells: {
@@ -503,5 +513,28 @@ export class WarbandPrismaRepository implements WarbandsRepository {
 
     return plainToInstance(BaseFigure, figures);
   }
-  
+  async createSharedLink(warbandId: string, bandSnapShot: any): Promise<SharedLink> {
+    const sharedLink = await this.prisma.sharedLink.create({
+      data: {
+        warbandId,
+        bandSnapShot
+      },
+    });
+    return plainToInstance(SharedLink, sharedLink);
+  }
+  async updateSharedLink(id: string, bandSnapShot: any): Promise<SharedLink> {
+    const sharedLink = await this.prisma.sharedLink.updateMany({
+      where: { warbandId: id },
+      data: {
+        bandSnapShot
+      } ,
+    });
+    return plainToInstance(SharedLink, sharedLink);
+  }
+  async findSharedLinkById(id: string): Promise<SharedLink> {
+    const sharedLink = await this.prisma.sharedLink.findUniqueOrThrow({
+      where: { id },
+    });
+    return plainToInstance(SharedLink, sharedLink);
+  }
 }

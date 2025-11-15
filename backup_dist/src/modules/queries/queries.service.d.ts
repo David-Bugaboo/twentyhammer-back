@@ -37,4 +37,6 @@ export declare class QueriesService {
     findBaseFigureByslug(slug: string): Promise<import("../../entities/base-figure.entity").BaseFigure>;
     findEquipmentToWarbandSoldierById(id: string): Promise<import("../soldiers/entities/equipment-to-warband-soldier.entity").EquipmentToWarbandSoldier>;
     findEquipmentToVaultById(id: string): Promise<import("../warbands/entities/equipment-to-vault.entity").EquipmentToVault>;
+    findSkillToWarbandSoldierById(id: string): Promise<import("../soldiers/entities/skill-to-warband-soldier.entity").SkillToWarbandSoldier>;
+    findSpellToWarbandSoldierById(id: string): Promise<import("../soldiers/entities/spell-to-warband-soldier.entity").SpellToWarbandSoldier>;
 }

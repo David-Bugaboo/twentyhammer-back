@@ -15,6 +15,7 @@ export declare class AuthController {
                     name: string;
                     createdAt: Date;
                     slug: string;
+                    jsonData: import("@prisma/client/runtime/library").JsonValue | null;
                 };
             } & {
                 id: string;

@@ -5,4 +5,5 @@ export declare class SpellToWarbandSoldier {
     warbandSoldierId: string;
     createdAt: Date;
     spell?: Spell;
+    modifier: number;
 }

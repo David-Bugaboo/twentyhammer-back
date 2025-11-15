@@ -1,4 +1,6 @@
 import { SoldiersService } from './soldiers.service';
+import { UpdateSoldierDto } from './dto/update-soldier.dto';
+import { PromoteHeroDto } from './dto/promote-hero.dto';
 export declare class SoldiersController {
     private readonly soldiersService;
     constructor(soldiersService: SoldiersService);
@@ -20,4 +22,10 @@ export declare class SoldiersController {
     removeAdvancementFromSoldier(advancementToWarbandSoldierId: string): Promise<void>;
     addSuperNaturalAbilityToSoldier(soldierId: string, superNaturalAbilitySlug: string): Promise<void>;
     removeSuperNaturalAbilityFromSoldier(superNaturalAbilityToWarbandSoldierId: string): Promise<void>;
+    updateSoldier(soldierId: string, updateSoldierDto: UpdateSoldierDto): Promise<void>;
+    fortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    unfortifySpell(spellToWarbandSoldierId: string): Promise<void>;
+    promoteToHero(soldierId: string, promoteHeroDto: PromoteHeroDto): Promise<void>;
+    promoteLeader(soldierId: string): Promise<void>;
+    toggleSoldierActive(soldierId: string): Promise<void>;
 }

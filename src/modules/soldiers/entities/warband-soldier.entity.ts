@@ -22,6 +22,10 @@ export class WarbandSoldier {
   effectiveRole?: Role | null;
   createdAt!: Date;
   extraSpecialRules?: unknown;
+  @Type(() => ExtraSpellLoreToWarbandSoldier)
+  extraSpellsLores?: ExtraSpellLoreToWarbandSoldier[];
+  @Type(() => ExtraSkillListToWarbandSoldier)
+  extraSkillsLists?: ExtraSkillListToWarbandSoldier[];
   @Type(() => AdvancementToWarbandSoldier)
   advancements?: AdvancementToWarbandSoldier[];
   @Type(() => BaseFigureToWarbandSoldier)

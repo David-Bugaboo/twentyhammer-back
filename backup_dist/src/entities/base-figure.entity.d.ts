@@ -2,6 +2,10 @@ import type { Role as PrismaRole } from '@prisma/client';
 import { FigureToAvaiableEquipment } from './figure-to-avaiable-equipment.entity';
 import { FigureToSkillList } from './figure-to-skill-list.entity';
 import { FigureToSpellLore } from './figure-to-spell-lore.entity';
+import { MercenaryStartingEquipment } from './mercenary-starting-equipment.entity';
+import { LegendStartingEquipment } from './legend-starting-equipment.entity';
+import { LegendStartingSpells } from './legend-starting-spells.entity';
+import { LegendStartingSkills } from './legend-starting-skills.entity';
 export type Role = PrismaRole;
 export declare class BaseFigure {
     id: string;
@@ -33,4 +37,8 @@ export declare class BaseFigure {
     avaiableEquipment?: FigureToAvaiableEquipment[];
     skillLists?: FigureToSkillList[];
     spellLores?: FigureToSpellLore[];
+    mercenaryStartingEquipment?: MercenaryStartingEquipment[];
+    legendStartingEquipment?: LegendStartingEquipment[];
+    legendStartingSpells?: LegendStartingSpells[];
+    legendStartingSkills?: LegendStartingSkills[];
 }

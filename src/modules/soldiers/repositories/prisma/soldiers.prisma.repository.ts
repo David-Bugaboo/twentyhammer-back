@@ -334,9 +334,15 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
     });
   }
   async equipGear(equipmentToWarbandSoldierId: string, slot: string): Promise<void> { 
+    
+
+
     await this.prisma.equipmentToWarbandSoldier.update({
       where: { id: equipmentToWarbandSoldierId },
-      data: {
+      data: slot === `Par` ? {
+        mainHandEquiped: true,
+        offHandEquiped: true,
+      } : {
         [slot]: true,
       },
     });

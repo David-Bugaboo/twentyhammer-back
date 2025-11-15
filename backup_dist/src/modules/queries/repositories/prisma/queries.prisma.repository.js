@@ -177,7 +177,7 @@ let QueriesPrismaRepository = class QueriesPrismaRepository {
                 name: dto.name ? { contains: dto.name } : undefined,
                 category: dto.category ? { equals: dto.category } : undefined,
                 effect: dto.effect ? { contains: dto.effect } : undefined,
-                multiplier: dto.multiplier !== undefined ? { equals: dto.multiplier } : undefined,
+                multiplier: dto.multiplier ? { equals: Number(dto.multiplier) } : undefined,
             },
         });
     }
@@ -306,6 +306,11 @@ let QueriesPrismaRepository = class QueriesPrismaRepository {
                         skill: true,
                     },
                 },
+                legendStartingEquipment: {
+                    include: {
+                        equipment: true
+                    }
+                },
                 mercenaryStartingEquipment: {
                     include: {
                         equipment: true,
@@ -331,6 +336,18 @@ let QueriesPrismaRepository = class QueriesPrismaRepository {
         return this.prisma.equipmentToVault.findUniqueOrThrow({
             where: { id },
             include: { equipment: true, modifier: true, warband: true },
+        });
+    }
+    async findSkillToWarbandSoldierById(id) {
+        return this.prisma.skillToWarbandSoldier.findUniqueOrThrow({
+            where: { id },
+            include: { skill: true, warbandSoldier: true },
+        });
+    }
+    async findSpellToWarbandSoldierById(id) {
+        return this.prisma.spellToWarbandSoldier.findUniqueOrThrow({
+            where: { id },
+            include: { spell: true, warbandSoldier: true },
         });
     }
 };

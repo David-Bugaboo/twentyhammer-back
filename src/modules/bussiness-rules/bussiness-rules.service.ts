@@ -204,16 +204,11 @@ export class BussinessRulesService {
     warbandSoldierSkills: string[],
     warbandSoldierSkillLists: string[],
     warbandSoldierAdvancements: string[],
+    warbandSoldierExtraSkillsLists: string[]
   ): Promise<void> {
-    const hasSkillLists = warbandSoldierSkillLists.length > 0;
+    const hasSkillLists = warbandSoldierSkillLists.length > 0 || warbandSoldierExtraSkillsLists.length > 0;
 
-    const howManySkillAdvancements = warbandSoldierAdvancements.filter(advancement => advancement === `nova-habilidade`).length;
     
-    const howManySkills = warbandSoldierSkills.length 
-
-    if(howManySkills >= howManySkillAdvancements) {
-      throw new BadRequestException('sem avanços de habilidade suficientes para aprender uma habilidade!');
-    }
 
 
     if (!hasSkillLists) {
@@ -254,22 +249,15 @@ export class BussinessRulesService {
     warbandSoldierSpells: string[],
     warbandSoldierSkills: string[],
     warbandSoldierAdvancements: string[],
+    warbandSoldierExtraSpellLores: string[],
   ): Promise<void> {
-    const hasSpellLore = warbandSoldierSpellLores.length > 0;
+    const hasSpellLore = warbandSoldierSpellLores.length > 0 || warbandSoldierExtraSpellLores.length > 0;
     const hasArcaneLearning =
       warbandSoldierSkills.includes(`aprendizado-arcano`);
-    const isCaster = hasSpellLore || hasArcaneLearning;
+    const isCaster = hasSpellLore 
     const spellAlreadyKnown = warbandSoldierSpells.includes(spellSlug);
-    const howManySpellAdvancements = warbandSoldierAdvancements.filter(advancement => advancement === `nova-magia`).length;
-    const howManySpells = warbandSoldierSpells.length;
+    
 
-    if(howManySpells >= howManySpellAdvancements) {
-      throw new BadRequestException('sem avanços de magia suficientes para aprender uma magia!');
-    }
-
-    if(howManySpells >= howManySpellAdvancements) {
-      throw new BadRequestException('sem avanços de magia suficientes para aprender uma magia!');
-    }
 
     if (!isCaster) {
       throw new BadRequestException('Figura não é um conjurador!');
@@ -393,11 +381,14 @@ export class BussinessRulesService {
           warbandSoldierEquipment.equipment?.specialRules,
         ).some(rule => rule.label === `Desbalanceada`),
     );
+    const weaponIsPair = equipamentSpecialRules.some(rule => rule.label === `Par`);
     const weaponIsTwoHanded = equipamentSpecialRules.some(rule => rule.label === `Duas Mãos`); 
     const weaponIsVersatile = equipamentSpecialRules.some(rule => rule.label === `Versátil`);
     
     const hasOffhandRestriction =
-    hasColossalClaw || hasCrushedForearm || usingUnbalancedInMainHand;
+      hasColossalClaw || hasCrushedForearm || usingUnbalancedInMainHand;
+    
+    
 
     if (hand === 'offHandEquiped' && (!isValidOffhandCategory || hasOffhandRestriction)) 
       throw new BadRequestException('Equipamento não permitido para esta mão!');
@@ -428,6 +419,7 @@ export class BussinessRulesService {
     if (hasAtLeastOneDagger && howManyCloseCombatWeapons >= 1) {
       howManyCloseCombatWeapons -= 1;
     }
+ 
     if ((equipmentCategory === `Arma Corpo a Corpo` || equipmentCategory === `Escudo`)  && howManyCloseCombatWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas arma corpo a corpo!');
     if ((equipmentCategory === `Arma a Distância` || equipmentCategory === `Arma de Fogo`) && howManyRangedWeapons >= 2) throw new BadRequestException('Figura não pode carregar mais de duas armas a distância!');
     if (equipmentCategory === `Armadura` && howManyArmors >= 1) throw new BadRequestException('Figura não pode carregar mais de uma armadura!');
@@ -456,6 +448,11 @@ export class BussinessRulesService {
     const hasCrushedForearm = warbandSoldierInjuries.includes(`antebraco-esmagado`);
     const weaponIsOffhandValid = equipamentSpecialRules.some(rule => rule.label === `Leve` || rule.label === `Pistola`) || equipment.category === `Escudo`;
     const mainHandWeaponIsDesbalanced = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true && this.normalizeSpecialRules(equipmentToWarbandSoldier.equipment?.specialRules).some(rule => rule.label === `Desbalanceada`));
+    const weaponIsPair = equipamentSpecialRules.some(rule => rule.label === `Par`);
+
+    if(weaponIsPair) {
+      throw new BadRequestException('Figura não pode equipar arma par na mão secundária!');
+    }
 
     if (hasColossalClaw || hasCrushedForearm) {
       throw new BadRequestException('Figura não pode equipar sua mão secundária!');
@@ -478,6 +475,20 @@ export class BussinessRulesService {
     const hasOffHandEqquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.offHandEquiped === true && equipmentToWarbandSoldier.equipment?.category !== `Escudo`);
     const isvalidMainHand = validMainHandCategories.includes(equipment.category);
     const hasTwoHandedWeaponEquiped = warbandSoldierEquipmentList.some(equipmentToWarbandSoldier => equipmentToWarbandSoldier.twoHandedEquiped === true);
+    const weaponIsPair = equipamentSpecialRules.some(rule => rule.label === `Par`);
+    const hasColossalClaw = warbandSoldierMutations.includes(`garra-colossal`);
+    const hasCrushedForearm = warbandSoldierInjuries.includes(`antebraco-esmagado`);
+
+
+     
+
+    if(weaponIsPair && hasOffHandEqquiped) {
+      throw new BadRequestException('Figura não pode equipar arma par de mão secundária!');
+    }
+
+    if(weaponIsPair && (hasColossalClaw || hasCrushedForearm)) {
+      throw new BadRequestException('Figura não pode equipar arma par!');
+    }
 
     if(hasTwoHandedWeaponEquiped) {
       throw new BadRequestException('Mãos já ocupadas!');
