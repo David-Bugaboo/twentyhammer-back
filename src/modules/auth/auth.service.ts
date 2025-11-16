@@ -10,7 +10,7 @@ import { firstValueFrom } from 'rxjs';
 export class AuthService {
   constructor(private readonly httpService: HttpService) {}
    async sendPasswordChangeEmail(email: string) {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://twentyheim.com.br/reset-password' }	);
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://twentyheim.com.br/change-password' }	);
     if (error) {
       throw new BadRequestException(error.message);
     }
