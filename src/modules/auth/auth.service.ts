@@ -18,7 +18,7 @@ export class AuthService {
     
     
 
-    await supabase.auth.setSession({ access_token: token, refresh_token: token }	);
+    await supabase.auth.setSession({ access_token: token, refresh_token: refreshToken }	);
    
     const { data, error } = await supabase.auth.updateUser({
       password,
