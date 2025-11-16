@@ -18,7 +18,7 @@ export class AuthService {
   async changePassword(password: string, token: string) {
     console.log('password >>>>>', password);
     try {
-    await this.httpService.post('https://admin.twentyheim.com.br/auth/v1/user', {
+    const response = this.httpService.post('https://admin.twentyheim.com.br/auth/v1/user', {
       password,
     }, {
       headers: {
@@ -27,6 +27,7 @@ export class AuthService {
         'Content-Type': 'application/json',
         }
       })
+      console.log('response >>>>>', response);
       return { message: 'senha mudada com sucesso' };
     } catch (error) {
       throw new BadRequestException(error.message);
