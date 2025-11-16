@@ -16,13 +16,14 @@ export class AuthService {
     return data;
   }
   async changePassword(password: string, token: string) {
+    console.log('password >>>>>', password);
     try {
     await this.httpService.post('https://admin.twentyheim.com.br/auth/v1/user', {
       password,
     }, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'apikey': process.env.ANON_KEY
+        'apikey': process.env.SERVICE_ROLE_KEY
         }
       })
       return { message: 'senha mudada com sucesso' };
