@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+
 import { supabase } from 'src/supabase/supabase.client';
-import { createClient } from '@supabase/supabase-js';
+
 import { HttpService } from '@nestjs/axios';
 
 
