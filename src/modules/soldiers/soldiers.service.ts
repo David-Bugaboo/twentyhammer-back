@@ -201,12 +201,10 @@ export class SoldiersService {
     const soldier = await this.repo.findSoldierById(spell.warbandSoldierId);
     const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
     const soldierSpells = soldier.spells
-    const howManySpellFortifies = soldierSpells?.reduce((acc, spell) => acc + spell.modifier, 0) ?? 0
-    const howManyFortifyAdvancements = soldierAdvancements.filter(advancement => advancement === `fortalecer-magia`).length;
+
+   
     
-    if(howManySpellFortifies! >= howManyFortifyAdvancements) {
-      throw new BadRequestException('sem avanços de fortificação de magia suficientes para desfortificar uma magia!');
-    }
+    
 
     if (spell.modifier === 0) {
       throw new BadRequestException('Feitiço não fortificado.');

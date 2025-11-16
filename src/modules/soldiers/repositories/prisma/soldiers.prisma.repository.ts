@@ -199,17 +199,24 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       const skill = await tx.skill.findUniqueOrThrow({
         where: { slug: skillToWarbandSoldier.skillSlug },
       });
+
+      if(skill.extraSkillLists?.length > 0) {
+        await tx.warbanSoldierToSKillLists.deleteMany({
+          where: { warbandSoldierId: skillToWarbandSoldier.warbandSoldierId, skillListSlug: { in: skill.extraSkillLists } },
+        });
+      }
+      if(skill.extraSpellLores?.length > 0) {
+        await tx.warbandSoldierToSpellsLores.deleteMany({
+          where: { warbandSoldierId: skillToWarbandSoldier.warbandSoldierId, spellLoreSlug: { in: skill.extraSpellLores } },
+        });
+      }	
+
       await tx.warbandSoldier.update({
         where: { id: skillToWarbandSoldier.warbandSoldierId },
         data: {
           skills: { delete: { id: SkillToWarbandSoldierId } },  
-          extraSkillsLists: { deleteMany: skill.extraSkillLists?.map(skillList => ({ skillListSlug: skillList })) ?? [] },
-          extraSpellsLores: { deleteMany: skill.extraSpellLores?.map(spellLore => ({ spellLoreSlug: spellLore })) ?? [] },
         },
       });
-      await tx.skillToWarbandSoldier.delete({
-          where: { id: SkillToWarbandSoldierId },
-        });
     });
   }
   async killSoldier(soldierId: string): Promise<void> {
