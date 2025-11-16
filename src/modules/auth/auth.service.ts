@@ -19,7 +19,7 @@ export class AuthService {
   async changePassword(password: string, token: string) {
     console.log('password >>>>>', password);
     try {
-    const response = firstValueFrom(this.httpService.post('https://admin.twentyheim.com.br/auth/v1/user', {
+    const response = firstValueFrom(this.httpService.put('https://admin.twentyheim.com.br/auth/v1/user', {
       password,
     }, {
       headers: {
