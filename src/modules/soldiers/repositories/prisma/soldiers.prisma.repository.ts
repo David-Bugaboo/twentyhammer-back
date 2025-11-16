@@ -199,12 +199,6 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
       const skill = await tx.skill.findUniqueOrThrow({
         where: { slug: skillToWarbandSoldier.skillSlug },
       });
-      await tx.warbandSoldier.update({
-        where: { id: skillToWarbandSoldier.warbandSoldierId },
-        data: {
-          skills: { delete: { id: SkillToWarbandSoldierId } },  
-        },
-      });
 
       if(skill.extraSkillLists?.length > 0) {
         await tx.warbanSoldierToSKillLists.deleteMany({
@@ -216,9 +210,13 @@ export class SoldiersPrismaRepository implements SoldiersRepository {
           where: { warbandSoldierId: skillToWarbandSoldier.warbandSoldierId, spellLoreSlug: { in: skill.extraSpellLores } },
         });
       }	
-      await tx.skillToWarbandSoldier.delete({
-          where: { id: SkillToWarbandSoldierId },
-        });
+
+      await tx.warbandSoldier.update({
+        where: { id: skillToWarbandSoldier.warbandSoldierId },
+        data: {
+          skills: { delete: { id: SkillToWarbandSoldierId } },  
+        },
+      });
     });
   }
   async killSoldier(soldierId: string): Promise<void> {
