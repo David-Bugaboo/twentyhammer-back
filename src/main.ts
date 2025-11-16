@@ -5,7 +5,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
       app.enableCors({
-      origin: ["http://localhost:5173", "https://twentyheim.fortalhammer.com.br"],
+      origin: ["http://localhost:5173", "https://twentyheim.com.br"],
       credentials: true,
     });
   await app.listen(process.env.PORT ?? 3001);
