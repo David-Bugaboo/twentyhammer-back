@@ -84,8 +84,8 @@ export class AuthController {
     return this.authService.sendPasswordChangeEmail(email);
   }
   @Post('change-password')
-  async changePassword(@Body("password") password: string, @Param("token") token: string, @Param("refreshToken") refreshToken: string) {
+  async changePassword(@Body("password") password: string, @Param("token") token: string) {
     
-    return this.authService.changePassword(password, token, refreshToken);
+    return this.authService.changePassword(password, token);
   }
 }
