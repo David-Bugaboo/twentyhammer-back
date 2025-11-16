@@ -13,14 +13,14 @@ export class AuthService {
     }
     return data;
   }
-  async changePassword(password: string, token: string) {
+  async changePassword(password: string, token: string, refreshToken: string) {
     
     
     
 
-    const supabaseAuthInstance = createClient(process.env.SUPABASE_URL!, token);
+    await supabase.auth.setSession({ access_token: token, refresh_token: token }	);
    
-    const { data, error } = await supabaseAuthInstance.auth.updateUser({
+    const { data, error } = await supabase.auth.updateUser({
       password,
     });
     if (error) {
