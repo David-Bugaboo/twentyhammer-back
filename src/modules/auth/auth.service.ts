@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 @Injectable()
 export class AuthService {
    async sendPasswordChangeEmail(email: string) {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://twentyheim.com.br/reset-password' }	);
     if (error) {
       throw new BadRequestException(error.message);
     }
@@ -15,12 +15,10 @@ export class AuthService {
   }
   async changePassword(password: string, token: string) {
     
-    const session = await supabase.auth.exchangeCodeForSession(token);
-    if (session.error) {
-      throw new BadRequestException(session.error.message);
-    }
+    
+    
 
-    const supabaseAuthInstance = createClient(process.env.SUPABASE_URL!, session.data.session?.access_token || '');
+    const supabaseAuthInstance = createClient(process.env.SUPABASE_URL!, token);
    
     const { data, error } = await supabaseAuthInstance.auth.updateUser({
       password,
