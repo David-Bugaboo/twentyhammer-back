@@ -145,6 +145,15 @@ export class BussinessRulesService {
     const equipmentCost = equipment.cost * modifierMultiplier;
     const shouldRejectEquipment = !isInAllowed || isInExcluded;
     const hasEnoughCrowns = warband.crowns >= equipmentCost;
+    const hasArsenalMaster = warband.warbandSoldiers?.some(warbandSoldier =>
+      warbandSoldier.skills?.some(skillToWarbandSoldier => skillToWarbandSoldier.skillSlug === `mestre-do-arsenal`)
+    );
+    const hasShootingMaster = warband.warbandSoldiers?.some(warbandSoldier =>
+      warbandSoldier.skills?.some(skillToWarbandSoldier => skillToWarbandSoldier.skillSlug === `mestre-atirador`)
+    );
+
+    if(hasArsenalMaster && equipment.category === `Arma Corpo a Corpo` && hasEnoughCrowns) return 
+    if(hasShootingMaster && (equipment.category === `Arma a Distância` || equipment.category === `Arma de Fogo`) && hasEnoughCrowns) return ;
 
     if (shouldRejectEquipment) {
       throw new BadRequestException(
