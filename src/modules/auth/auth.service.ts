@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { supabase } from 'src/supabase/supabase.client';
 
 import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class AuthService {
   async changePassword(password: string, token: string) {
     console.log('password >>>>>', password);
     try {
-    const response = this.httpService.post('https://admin.twentyheim.com.br/auth/v1/user', {
+    const response = firstValueFrom(this.httpService.post('https://admin.twentyheim.com.br/auth/v1/user', {
       password,
     }, {
       headers: {
@@ -27,7 +28,8 @@ export class AuthService {
         'Content-Type': 'application/json',
         }
       })
-      console.log('response >>>>>', response);
+    );
+    console.log('response >>>>>', response);
       return { message: 'senha mudada com sucesso' };
     } catch (error) {
       throw new BadRequestException(error.message);
