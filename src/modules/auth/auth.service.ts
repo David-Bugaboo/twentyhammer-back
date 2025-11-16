@@ -14,7 +14,14 @@ export class AuthService {
     return data;
   }
   async changePassword(password: string, token: string) {
-    const supabaseAuthInstance  = createClient(process.env.SUPABASE_URL!, token);
+    
+    const session = await supabase.auth.exchangeCodeForSession(token);
+    if (session.error) {
+      throw new BadRequestException(session.error.message);
+    }
+
+    const supabaseAuthInstance = createClient(process.env.SUPABASE_URL!, session.data.session?.access_token || '');
+   
     const { data, error } = await supabaseAuthInstance.auth.updateUser({
       password,
     });
