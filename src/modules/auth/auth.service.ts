@@ -7,10 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 @Injectable()
 export class AuthService {
    async sendPasswordChangeEmail(email: string) {
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'recovery',
-      email,
-    });
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
       throw new BadRequestException(error.message);
     }
