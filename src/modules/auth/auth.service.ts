@@ -24,7 +24,7 @@ export class AuthService {
     }, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'apikey': process.env.SERVICE_ROLE_KEY,
+        'apikey': process.env.ANON_KEY,
         'Content-Type': 'application/json',
         }
       })
