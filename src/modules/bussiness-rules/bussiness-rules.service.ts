@@ -551,6 +551,7 @@ export class BussinessRulesService {
     console.log(`equipamento da mão secundaria: ${offHandEquipment?.equipment?.name}`);
 
     if (hasOffHandedBlocked) return false;
+    if(mainHandEquipment.equipmentSlug === "funda" && offHandEquipment.equipmentSlut === "funda") return false
 
     if (isUnarmed && hasArteDaMorteSilenciosa) return true;
     
