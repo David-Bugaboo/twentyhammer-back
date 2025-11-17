@@ -202,10 +202,6 @@ export class SoldiersService {
     const soldierAdvancements = soldier.advancements?.map(advancement => advancement.advancementSlug) ?? [];
     const soldierSpells = soldier.spells
 
-   
-    
-    
-
     if (spell.modifier === 0) {
       throw new BadRequestException('Feitiço não fortificado.');
     }

@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   UnauthorizedException,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -77,5 +78,15 @@ export class AuthController {
     );
 
     return newUser;
+  }
+
+  @Post('send-password-change-email')
+  async sendPasswordChangeEmail(@Body("email") email: string) {
+    return this.authService.sendPasswordChangeEmail(email);
+  }
+  @Post('change-password')
+  async changePassword(@Body("password") password: string, @Query("access_token") access_token: string) {
+    
+    return this.authService.changePassword(password, access_token);
   }
 }
