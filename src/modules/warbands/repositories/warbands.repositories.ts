@@ -38,7 +38,9 @@ export abstract class WarbandsRepository {
     warbandId: string,
     equipment: Equipment,
     loot: boolean,
+    discount: number,
     modifier?: Modifier | null,
+    
   ): Promise<Warband>;
   abstract undoEquipmentFromWarbandVault(
     warbandId: string,

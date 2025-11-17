@@ -387,10 +387,11 @@ export class WarbandPrismaRepository implements WarbandsRepository {
     warbandId: string,
     equipment: Equipment,
     loot: boolean,
+    discount: number,
     modifier?: Modifier | null,
   ): Promise<Warband> {
     const multiplier = modifier?.multiplier ?? 1;
-    const equipmentCost = loot ? 0 : equipment.cost * multiplier;
+    const equipmentCost = loot ? 0 : (equipment.cost * multiplier) - discount;
     const updated = await this.prisma.warband.update({
       where: {
         id: warbandId,

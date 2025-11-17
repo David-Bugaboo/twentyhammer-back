@@ -67,6 +67,7 @@ export class WarbandsService {
     warbandId: string,
     dto: AddEquipmentToVaultDto,
     loot: boolean,
+    discount: number,
   ) {
     const warband = await this.resolveWarband(warbandId);
     const equipment = await this.bussinessRulesService.resolveEquipment(
@@ -91,7 +92,9 @@ export class WarbandsService {
       warbandId,
       equipment,
       loot,
+      discount,
       modifier,
+      
     );
   }
   async undoEquipmentFromVault(warbandId: string, equipmentToVaultId: string, sell: boolean) {

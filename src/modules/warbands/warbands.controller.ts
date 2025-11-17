@@ -74,11 +74,11 @@ export class WarbandsController {
     @Param('id') id: string,
     @Body() dto: AddEquipmentToVaultDto,
     @Query('loot') loot: string,
+    @Query('discount') discount: number,
   ) {
     const boolLoot = loot === 'true' ? true : false;
-    
-    console.log(loot);
-    return this.warbandsService.addEquipmentToVault(id, dto, boolLoot);
+    discount = Number(discount) ? discount : 0;
+    return this.warbandsService.addEquipmentToVault(id, dto, boolLoot, discount);
   }
 
   @UseGuards(JwtAuthGuard)
