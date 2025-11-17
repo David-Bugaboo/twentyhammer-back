@@ -430,9 +430,12 @@ export class WarbandPrismaRepository implements WarbandsRepository {
       });
 
       const multiplier = vaultEquipment.modifier?.multiplier ?? 1;
-      const equipmentCost = sell
+      let equipmentCost = sell
         ? Math.floor((vaultEquipment.equipment.cost * multiplier) / 2)
         : vaultEquipment.equipment.cost * multiplier;
+      
+      if (destroy) {
+        equipmentCost = 0;
 
       return tx.warband.update({
         where: {
