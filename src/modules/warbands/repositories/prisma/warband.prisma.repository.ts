@@ -434,8 +434,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         ? Math.floor((vaultEquipment.equipment.cost * multiplier) / 2)
         : vaultEquipment.equipment.cost * multiplier;
       
-      if (destroy) {
-        equipmentCost = 0;
+      if (destroy) equipmentCost = 0;
 
       return tx.warband.update({
         where: {
@@ -453,7 +452,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
         },
         include: this.defaultWarbandInclude,
       });
-    });
+    } );
 
     return plainToInstance(Warband, updated);
   }
