@@ -45,6 +45,7 @@ export abstract class WarbandsRepository {
   abstract undoEquipmentFromWarbandVault(
     warbandId: string,
     equipmentToVaultId: string,
+    destroy: boolean,
     sell: boolean,
   ): Promise<Warband>;
   abstract findWarbandAvaiableHirings(factionName: string): Promise<BaseFigure[]>;

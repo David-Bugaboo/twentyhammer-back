@@ -97,11 +97,12 @@ export class WarbandsService {
       
     );
   }
-  async undoEquipmentFromVault(warbandId: string, equipmentToVaultId: string, sell: boolean) {
+  async undoEquipmentFromVault(warbandId: string, equipmentToVaultId: string, destroy: boolean, sell: boolean) {
     await this.resolveWarband(warbandId);
     return this.repo.undoEquipmentFromWarbandVault(
       warbandId,
       equipmentToVaultId,
+      destroy,
       sell
     );
   }

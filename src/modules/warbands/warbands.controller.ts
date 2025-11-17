@@ -86,13 +86,16 @@ export class WarbandsController {
   undoEquipmentFromVault(
     @Param('warbandId') warbandId: string,
     @Param('warbandToVaultItem') warbandToVaultItem: string,
+    @Query('destroy') destroy: string,
     @Query('sell') sell: string,
   ) {
     const boolSell = sell === 'true' ? true : false;
+    const boolDestroy = destroy === 'true' ? true : false;
     console.log(sell);
     return this.warbandsService.undoEquipmentFromVault(
       warbandId,
       warbandToVaultItem,
+      boolDestroy,
       boolSell,
     );
   }

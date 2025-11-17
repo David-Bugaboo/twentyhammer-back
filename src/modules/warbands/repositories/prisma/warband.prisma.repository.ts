@@ -414,6 +414,7 @@ export class WarbandPrismaRepository implements WarbandsRepository {
   async undoEquipmentFromWarbandVault(
     warbandId: string,
     equipmentToVaultId: string,
+    destroy: boolean,
     sell: boolean,
   ): Promise<Warband> {
     const updated = await this.prisma.$transaction(async (tx) => {
