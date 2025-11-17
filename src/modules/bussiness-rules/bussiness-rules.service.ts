@@ -541,17 +541,13 @@ export class BussinessRulesService {
     const hasArteDaMorteSilenciosa = skills.some(skill => skill.skill?.slug === `arte-da-morte-silenciosa`);
     const isUnarmed = equipment.every(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === false && equipmentToWarbandSoldier.offHandEquiped === false && equipmentToWarbandSoldier.twoHandedEquiped === false);
     const mainHandEquipment = equipment.find(equipmentToWarbandSoldier => equipmentToWarbandSoldier.mainHandEquiped === true);
-    console.log(`mão principal: ${mainHandEquipment?.equipment?.name}`);
-    console.log(`mão secundária: ${offHandEquipment?.equipment?.name}`);
-    console.log(`mão secundária bloqueada: ${hasOffHandedBlocked}`);
-    console.log(`está desarmada: ${isUnarmed}`);
-    console.log(`tem arte da morte silenciosa: ${hasArteDaMorteSilenciosa}`);
-    console.log(`é escudo: ${offHandIsShield}`);
-    console.log(`equipamento da mão primária: ${mainHandEquipment?.equipment?.name}`);
-    console.log(`equipamento da mão secundaria: ${offHandEquipment?.equipment?.name}`);
+   const isMainHandSling = mainHandEquipment && mainHandEquipment.equipmentSlug === "funda"
+   const isOffHandSling = offHandEquipment && offHandEquipment.equipmentSlug === "funda"
+
+    if(isMainHandSling || isOffHandSling) return false
 
     if (hasOffHandedBlocked) return false;
-    if(mainHandEquipment.equipmentSlug === "funda" && offHandEquipment.equipmentSlut === "funda") return false
+    
 
     if (isUnarmed && hasArteDaMorteSilenciosa) return true;
     
