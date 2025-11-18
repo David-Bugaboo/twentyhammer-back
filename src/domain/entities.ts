@@ -114,7 +114,7 @@ export interface Modifier {
   effect: string;
   createdAt: Date;
   specialRules?: unknown;
-
+  rarity: number;
   equipmentsInVault?: EquipmentToVault[];
   equipmentToWarbandSoldiers?: EquipmentToWarbandSoldier[];
 }

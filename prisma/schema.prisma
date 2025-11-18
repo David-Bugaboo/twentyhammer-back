@@ -243,6 +243,7 @@ model Modifier {
   id                         String                      @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                       String                      @unique @map("slug")
   name                       String                      @map("name")
+  rarity                     Int                         @default(1)
   multiplier                 Int                         @map("multiplier")
   createdAt                  DateTime                    @default(now()) @map("created_at")
   specialRules               Json?                       @map("special_rules")
