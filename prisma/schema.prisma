@@ -6,7 +6,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model User {
   id        String    @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   name      String    @map("name")
@@ -18,7 +17,6 @@ model User {
 
   @@map("users")
 }
-
 model Warband {
   id              String             @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   name            String             @map("name")
@@ -35,7 +33,6 @@ model Warband {
 
   @@map("warbands")
 }
-
 model Faction {
   id        String       @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug      String       @unique @map("slug")
@@ -44,10 +41,48 @@ model Faction {
   jsonData  Json?        @map("json_data")
   figures   BaseFigure[]
   warbands  Warband[]
+  equipmentLists EquipmentList[]
 
   @@map("factions")
 }
-
+model EquipmentListToEquipment {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
+  name          String     @map("name")
+  equipmentListId   String     @map("equipment_list_id")
+  equipmentSlug String     @map("equipment_slug")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  equipment     Equipment  @relation(fields: [equipmentSlug], references: [slug], onDelete: Cascade)
+  hero_only     Boolean    @default(false) @map("hero_only")
+  custom_cost   Int?       @map("custom_cost")
+  factionEquipmentList EquipmentList @relation(fields: [equipmentListId], references: [id], onDelete: Cascade)
+}
+model ModifiersToEquipmentList {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
+  equipmentListId String     @map("equipment_list_id")
+  modifierSlug String     @map("modifier_slug")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  equipmentList EquipmentList @relation(fields: [equipmentListId], references: [id], onDelete: Cascade)
+  modifier Modifier @relation(fields: [modifierSlug], references: [slug], onDelete: Cascade)
+}
+model EquipmentList {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
+  slug          String     @unique @map("slug")
+  name          String     @map("name")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  factionSlug   String     @map("faction_slug")
+  faction       Faction    @relation(fields: [factionSlug], references: [slug], onDelete: Cascade)
+  equipments               EquipmentListToEquipment[]
+  figures                  EquipmentListToFigure[]
+  modifiers                ModifiersToEquipmentList[]
+}
+model EquipmentListToFigure {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
+  equipmentListId String     @map("equipment_list_id")
+  figureSlug String     @map("figure_slug")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  equipmentList EquipmentList @relation(fields: [equipmentListId], references: [id], onDelete: Cascade)
+  figure BaseFigure @relation(fields: [figureSlug], references: [slug], onDelete: Cascade)
+}
 model SharedLink {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   createdAt    DateTime @default(now()) @map("created_at")
@@ -58,7 +93,6 @@ model SharedLink {
 
   @@map("shared_links")
 }
-
 model BaseFigure {
   id                          String                       @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   name                        String                       @map("name")
@@ -71,14 +105,15 @@ model BaseFigure {
   race                        String?                      @map("race")
   factionSlug                 String?                      @map("faction_slug")
   cost                        Int                          @map("cost")
-  movement                    Int                          @map("movement")
-  fight                       Int                          @map("fight")
-  shoot                       Int                          @map("shoot")
-  armour                      Int                          @map("armour")
-  will                        Int                          @map("will")
-  health                      Int                          @map("health")
-  strength                    Int                          @map("strength")
-  equipmentSlots              Int                          @map("equipment_slots")
+  m                           Int                          @map("m")
+  ws                          Int                          @map("ws")
+  bs                          Int                          @map("bs")
+  s                           Int                          @map("s")
+  t                           Int                          @map("t")
+  w                           Int                          @map("w")
+  i                           Int                          @map("i")
+  a                           Int                          @map("a")
+  ld                          Int                          @map("ld")
   startingXp                  Int?                         @map("startingxp")
   createdAt                   DateTime                     @default(now()) @map("created_at")
   specialRules                Json                         @map("special_rules")
@@ -86,53 +121,39 @@ model BaseFigure {
   canGetMutations             Boolean                      @default(false) @map("can_get_mutations")
   canGetSacredMarks           Boolean                      @default(false) @map("can_get_sacred_marks")
   noXp                        Boolean                      @default(false) @map("no_xp")
-  naturalAttacks              Json?                        @map("natural_attacks")
   upkeep                      String?
   max                         Int?                         @map("max")
   min                         Int?                         @map("min")
   baseFigureToWarbandSoldiers BaseFigureToWarbandSoldier[]
   faction                     Faction?                     @relation(fields: [factionSlug], references: [slug], onDelete: Cascade)
   raceLimits                  Race?                        @relation(fields: [race], references: [slug], onDelete: Cascade)
-  avaiableEquipment           FigureToAvaiableEquipment[]
   skillLists                  FigureToSkillList[]
   spellLores                  FigureToSpellLore[]
   legendStartingEquipment     LegendStartingEquipment[]
   legendStartingSkills        LegendStartingSkills[]
   legendStartingSpells        LegendStartingSpells[]
   mercenaryStartingEquipment  MercenaryStartingEquipment[]
-
+  avaiableEquipmentLists EquipmentListToFigure[]
   @@map("base_figures")
 }
-
 model Race {
   id        String       @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug      String       @unique @map("slug")
   name      String       @map("name")
-  movement  Int          @map("movement")
-  fight     Int          @map("fight")
-  shoot     Int          @map("shoot")
-  armour    Int          @map("armour")
-  will      Int          @map("will")
-  health    Int          @map("health")
-  strength  Int          @map("strength")
+  m                           Int                          @map("m")
+  ws                          Int                          @map("ws")
+  bs                          Int                          @map("bs")
+  s                           Int                          @map("s")
+  t                           Int                          @map("t")
+  w                           Int                          @map("w")
+  i                           Int                          @map("i")
+  a                           Int                          @map("a")
+  ld                          Int                          @map("ld")
   createdAt DateTime     @default(now()) @map("created_at")
   figures   BaseFigure[]
 
   @@map("races")
 }
-
-model FigureToAvaiableEquipment {
-  id                    String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
-  figureSlug            String     @map("figure_slug")
-  avaiableEquipmentSlug String     @map("avaiable_equipment_slug")
-  customCost            Int?       @map("custom_cost")
-  createdAt             DateTime   @default(now()) @map("created_at")
-  avaiableEquipment     Equipment  @relation(fields: [avaiableEquipmentSlug], references: [slug], onDelete: Cascade)
-  figure                BaseFigure @relation(fields: [figureSlug], references: [slug], onDelete: Cascade)
-
-  @@map("figure_to_avaiable_equipment")
-}
-
 model FigureToSpellLore {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   figureSlug    String     @map("figure_slug")
@@ -143,7 +164,6 @@ model FigureToSpellLore {
 
   @@map("figure_to_spell_lore")
 }
-
 model FigureToSkillList {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   figureSlug    String     @map("figure_slug")
@@ -154,7 +174,6 @@ model FigureToSkillList {
 
   @@map("figure_to_skill_list")
 }
-
 model EquipmentToVault {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   warbandId     String    @map("warband_id")
@@ -168,33 +187,30 @@ model EquipmentToVault {
 
   @@map("equipment_to_vault")
 }
-
 model Equipment {
   id                          String                       @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                        String                       @unique @map("slug")
   name                        String                       @map("name")
   cost                        Int                          @map("cost")
   category                    String                       @map("category")
-  damageBonus                 Int?                         @map("damage_bonus")
+  strength                    Int?                         @map("damage_bonus")
   range                       Int?                         @map("range")
   createdAt                   DateTime                     @default(now()) @map("created_at")
   specialRules                Json?                        @map("special_rules")
-  armourBonus                 Int?                         @map("armour_bonus")
+  armourSave                  Int?                         @map("armour_bonus")
   avaiability                 String[]                     @map("avaiability")
   exclusions                  String[]                     @default([]) @map("exclusions")
-  movementPenalty             Int?                         @map("movement_penalty")
+  source                      String                       @map("source")
   rarity                      Int                          @default(1) @map("rarity")
-  slot                        Int?                         @map("slot")
-  attributeModifiers         Json?                         @map("attribute_modifiers") @default("{\"will\": 0, \"fight\": 0, \"shoot\": 0, \"armour\": 0, \"health\": 0, \"movement\": 0, \"strength\": 0}") 
+  attributeModifiers          Json?                         @map("attribute_modifiers") @default("{\"will\": 0, \"fight\": 0, \"shoot\": 0, \"armour\": 0, \"health\": 0, \"movement\": 0, \"strength\": 0}") 
   equipmentToVault            EquipmentToVault[]
   equipmentToWarbandSoldier   EquipmentToWarbandSoldier[]
-  figureToAvaiableEquipments  FigureToAvaiableEquipment[]
   legendStartingEquipments    LegendStartingEquipment[]
   mercenaryStartingEquipments MercenaryStartingEquipment[]
+  EquipmentListsToEquipment EquipmentListToEquipment[]
 
   @@map("equipments")
 }
-
 model MercenaryStartingEquipment {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   figureSlug    String     @map("figure_slug")
@@ -205,7 +221,6 @@ model MercenaryStartingEquipment {
 
   @@map("mercenary_starting_equipment")
 }
-
 model LegendStartingEquipment {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   figureSlug    String     @map("figure_slug")
@@ -216,7 +231,6 @@ model LegendStartingEquipment {
 
   @@map("legend_starting_equipment")
 }
-
 model LegendStartingSpells {
   id         String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   figureSlug String     @map("figure_slug")
@@ -227,7 +241,6 @@ model LegendStartingSpells {
 
   @@map("legend_starting_spells")
 }
-
 model LegendStartingSkills {
   id         String     @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   figureSlug String     @map("figure_slug")
@@ -238,7 +251,6 @@ model LegendStartingSkills {
 
   @@map("legend_starting_skills")
 }
-
 model Modifier {
   id                         String                      @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                       String                      @unique @map("slug")
@@ -252,10 +264,9 @@ model Modifier {
   attributeModifiers         Json?                       @map("attribute_modifiers")
   equipmentsInVault          EquipmentToVault[]
   equipmentToWarbandSoldiers EquipmentToWarbandSoldier[]
-
+  equipmentListsToModifiers ModifiersToEquipmentList[]
   @@map("modifiers")
 }
-
 model WarbandSoldier {
   id                     String                                @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   campaignName           String?                               @map("campaign_name")
@@ -266,14 +277,12 @@ model WarbandSoldier {
   effectiveRole          Role                                  @default(HEROI) @map("effective_role")
   promotedHeroSkills     String[]
   miscModifiers          Json?
-  notes                  String?
-  twoWeaponFighting      Boolean                               @default(false) @map("two_weapon_fighting")
+  notes                  String?                              
   active                 Boolean                               @default(true) @map("active")
   advancements           AdvancementToWarbandSoldier[]
   baseFigure             BaseFigureToWarbandSoldier[]
   equipment              EquipmentToWarbandSoldier[]
   injuries               InjuryToWarbandSoldier[]
-  promotedHeroSkillLists PromotedHeroSkillLists[]
   skills                 SkillToWarbandSoldier[]
   spells                 SpellToWarbandSoldier[]
   supernaturalAbilities  SuperNaturalAbilityToWarbandSoldier[]
@@ -283,18 +292,6 @@ model WarbandSoldier {
 
   @@map("warband_soldier")
 }
-
-model PromotedHeroSkillLists {
-  id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
-  warbandSoldierId String         @map("warband_soldier_id")
-  skillListSlug    String         @map("skill_list_slug")
-  createdAt        DateTime       @default(now()) @map("created_at")
-  skillList        SkillList      @relation(fields: [skillListSlug], references: [slug], onDelete: Cascade)
-  warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
-
-  @@map("promoted_hero_skill_lists")
-}
-
 model SpellToWarbandSoldier {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   spellSlug        String         @map("spell_slug")
@@ -306,7 +303,6 @@ model SpellToWarbandSoldier {
 
   @@map("spell_to_warband_soldier")
 }
-
 model SkillToWarbandSoldier {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   skillSlug        String         @map("skill_slug")
@@ -317,7 +313,6 @@ model SkillToWarbandSoldier {
 
   @@map("skill_to_warband_soldier")
 }
-
 model AdvancementToWarbandSoldier {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   advancementSlug  String         @map("advancement_slug")
@@ -328,7 +323,6 @@ model AdvancementToWarbandSoldier {
 
   @@map("advancement_to_warband_soldier")
 }
-
 model InjuryToWarbandSoldier {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   injurySlug       String         @map("injury_slug")
@@ -339,7 +333,6 @@ model InjuryToWarbandSoldier {
 
   @@map("injury_to_warband_soldier")
 }
-
 model SuperNaturalAbilityToWarbandSoldier {
   id                      String              @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   superNaturalAbilitySlug String              @map("super_natural_ability_slug")
@@ -350,7 +343,6 @@ model SuperNaturalAbilityToWarbandSoldier {
 
   @@map("super_natural_ability_to_warband_soldier")
 }
-
 model WarbanSoldierToSKillLists {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   warbandSoldierId String         @map("warband_soldier_id")
@@ -362,7 +354,6 @@ model WarbanSoldierToSKillLists {
 
   @@map("warband_soldier_to_skill_lists")
 }
-
 model WarbandSoldierToSpellsLores {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   warbandSoldierId String         @map("warband_soldier_id")
@@ -374,7 +365,6 @@ model WarbandSoldierToSpellsLores {
 
   @@map("warband_soldier_to_spells_lores")
 }
-
 model EquipmentToWarbandSoldier {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   equipmentSlug    String         @map("equipment_slug")
@@ -393,8 +383,7 @@ model EquipmentToWarbandSoldier {
   warbandSoldier   WarbandSoldier @relation(fields: [warbandSoldierId], references: [id], onDelete: Cascade)
 
   @@map("equipment_to_warband_soldier")
-}
-
+} 
 model BaseFigureToWarbandSoldier {
   id               String         @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   baseFigureSlug   String         @map("base_figure_slug")
@@ -405,7 +394,6 @@ model BaseFigureToWarbandSoldier {
 
   @@map("base_figure_to_warband_soldier")
 }
-
 model SuperNaturalAbility {
   id                                  String                                @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                                String                                @unique @map("slug")
@@ -420,7 +408,6 @@ model SuperNaturalAbility {
 
   @@map("super_natural_abilities")
 }
-
 model Injury {
   id                     String                   @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                   String                   @unique @map("slug")
@@ -432,7 +419,6 @@ model Injury {
 
   @@map("injuries")
 }
-
 model Advancement {
   id                          String                        @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                        String                        @unique @map("slug")
@@ -444,23 +430,21 @@ model Advancement {
 
   @@map("advancements")
 }
-
 model Spell {
   id                    String                  @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                  String                  @unique @map("slug")
   name                  String                  @map("name")
   difficultyClass       Int                     @map("difficulty_class")
+  roll                  Int                @map("roll")
   spellLoreSlug         String                  @map("spell_lore_slug")
   description           String                  @map("description")
   createdAt             DateTime                @default(now()) @map("created_at")
-  keywords              String[]                @map("keywords")
   legendStartingSpells  LegendStartingSpells[]
   spellToWarbandSoldier SpellToWarbandSoldier[]
   spellLore             SpellLore               @relation(fields: [spellLoreSlug], references: [slug], onDelete: Cascade)
 
   @@map("spells")
 }
-
 model Skill {
   id                    String                  @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                  String                  @unique @map("slug")
@@ -469,7 +453,6 @@ model Skill {
   description           String                  @map("description")
   createdAt             DateTime                @default(now()) @map("created_at")
   attributeModifiers    Json?                   @map("attribute_modifiers")
-  extraNaturalAttack    Json?                   @map("natural_attack")
   extraSkillLists       String[]                @map("extra_skill_lists")
   extraSpellLores       String[]                @map("extra_spell_lores")
   legendStartingSkills  LegendStartingSkills[]
@@ -478,7 +461,6 @@ model Skill {
 
   @@map("skills")
 }
-
 model SpellLore {
   id                          String                        @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                        String                        @unique @map("slug")
@@ -491,26 +473,20 @@ model SpellLore {
 
   @@map("spell_lores")
 }
-
 model SkillList {
   id                        String                      @id @default(dbgenerated("gen_random_uuid()")) @map("id")
   slug                      String                      @unique @map("slug")
   name                      String                      @map("name")
-  description               String                      @map("description")
   createdAt                 DateTime                    @default(now()) @map("created_at")
   figureToSkillLists        FigureToSkillList[]
-  promotedHeroesSkillLists  PromotedHeroSkillLists[]
   skills                    Skill[]
   warbanSoldierToSKillLists WarbanSoldierToSKillLists[]
-
   @@map("skill_lists")
 }
-
 enum UserRole {
   ADMIN
   USER
 }
-
 enum Role {
   LIDER
   HEROI

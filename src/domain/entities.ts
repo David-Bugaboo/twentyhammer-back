@@ -1,9 +1,4 @@
-/*
-  Domain entity types mirrored from prisma/schema.prisma
-  - camelCase for field names
-  - Dates as Date
-  - JSON columns as unknown (refine later if needed)
-*/
+
 
 export enum Role {
   LEADER = 'LEADER',
@@ -41,6 +36,7 @@ export interface Warband {
   faction?: Faction;
   vault?: EquipmentToVault[];
   warbandSoldiers?: WarbandSoldier[];
+  notes: string;
 }
 
 export interface BaseFigure {
@@ -58,12 +54,14 @@ export interface BaseFigure {
   race: string;
   factionSlug?: string | null;
   cost: number;
-  movement: number;
-  fight: number;
-  shoot: number;
-  armour: number;
-  will: number;
-  health: number;
+  m: number;
+  ws: number;
+  bs: number;
+  t: number;
+  w: number;
+  i: number;
+  a: number;
+  ld: number;
   strength: number;
   equipmentSlots: number;
   startingXp?: number | null;
